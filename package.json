@@ -1,0 +1,24 @@
+{
+  "name": "{{PRJ_NAME}}",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www {{PRJ_NAME}}"
+  },
+  "dependencies": {
+    "body-parser": "~1.13.2",
+    "cookie-parser": "~1.3.5",
+    "dateformat": "^1.0.11",
+    "debug": "~2.2.0",
+    "ejs": "~2.3.3",
+    "express": "~4.13.1",
+    "express-session": "^1.11.3",
+    "formidable": "^1.0.17",
+    "fs-extra": "^0.26.2",
+    "morgan": "~1.6.1",
+    "mysql": "^2.8.0",
+    "pinyin": "^2.3.3",
+    "serve-favicon": "~2.3.0",
+    "underscore": "^1.8.3"
+  }
+}
