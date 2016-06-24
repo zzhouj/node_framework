@@ -1,6 +1,7 @@
+_ = require 'underscore'
+path = require 'path'
 prompt = require './utils/prompt'
 myUtils = require './utils/myUtils'
-_ = require 'underscore'
 
 module.exports = (grunt) ->
   grunt.initConfig
@@ -13,12 +14,36 @@ module.exports = (grunt) ->
         'routes/index.js'
       ]
     add:
-      controllers: {src: 'template/controllers/', dest: 'controllers/'}
-      models: {src: 'template/models/', dest: 'models/'}
-      permissions: {src: 'template/permissions/', dest: 'permissions/'}
-      restful: {src: 'template/restful/', dest: 'restful/'}
-      app: {src: 'template/app/', dest: 'public/app/'}
-      nav: {src: 'template/nav.html', dest: 'views/baseApp.ejs', replaceText: '<!--{{nav}}-->'}
+      controllers:
+        cwd: 'template/controllers/'
+        filter: 'isFile'
+        src: '**'
+        dest: 'controllers/'
+      models:
+        cwd: 'template/models/'
+        filter: 'isFile'
+        src: '**'
+        dest: 'models/'
+      permissions:
+        cwd: 'template/permissions/'
+        filter: 'isFile'
+        src: '**'
+        dest: 'permissions/'
+      restful:
+        cwd: 'template/restful/'
+        filter: 'isFile'
+        src: '**'
+        dest: 'restful/'
+      app:
+        cwd: 'template/app/'
+        filter: 'isFile'
+        src: '**'
+        dest: 'public/app/'
+      nav:
+        cwd: 'template/'
+        src: 'nav.html'
+        dest: 'views/baseApp.ejs'
+        replaceText: '<!--{{nav}}-->'
 
   grunt.registerMultiTask 'init', ->
     done = @async()
@@ -72,12 +97,22 @@ module.exports = (grunt) ->
     if replaceText
       _.each @files, (file) ->
         replaceContent = ''
-        _.each file.src, (file) ->
-          replaceContent += grunt.file.read file
+        _.each file.src, (srcFile) ->
+          replaceContent += grunt.file.read path.join file.cwd, srcFile
         replaceContent = replaceContent.replace new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name
         replaceContent = replaceContent.replace new RegExp(myUtils.RegExpEscape("{{label}}"), 'g'), label
         replaceContent += "\n" + replaceText
         destContent = grunt.file.read file.dest
         destContent = destContent.replace new RegExp(myUtils.RegExpEscape(replaceText), 'g'), replaceContent
         grunt.file.write file.dest, destContent
+    else
+      _.each @files, (file) ->
+        _.each file.src, (srcFile) ->
+          destFile = srcFile.replace new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name
+          destFile = path.join file.dest, destFile
+          srcFile = path.join file.cwd, srcFile
+          grunt.file.copy srcFile, destFile,
+            process: (content) ->
+              content = content.replace new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name
+              content = content.replace new RegExp(myUtils.RegExpEscape("{{label}}"), 'g'), label
     done?()
