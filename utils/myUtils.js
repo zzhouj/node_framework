@@ -30,4 +30,8 @@
     return str;
   };
 
+  exports.RegExpEscape = function(str) {
+    return str != null ? str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") : void 0;
+  };
+
 }).call(this);

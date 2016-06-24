@@ -7,3 +7,6 @@ exports.padzero = (i, min = 3) ->
     pad = min - str.length
     str = "0#{str}" for [0...pad]
   str
+
+exports.RegExpEscape = (str) ->
+  str?.replace /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"
