@@ -10,6 +10,10 @@
         "debug": false,
         "connectionLimit": 10
     },
+    "redis": {
+        "host": "{{RDS_HOST}}",
+        "port": "{{RDS_PORT}}"
+    },
     "rootSecret": "{{ROOT_SECRET}}",
     "pageSize": 20
 }

@@ -57,6 +57,8 @@ module.exports = (grunt) ->
       'DB_NAME': ['database name', 'test']
       'DB_USER': ['database username', 'test']
       'DB_PASSWD': ['database password', '123456']
+      'RDS_HOST': ['redis host', 'localhost']
+      'RDS_PORT': ['redis server port', '6379']
       'ROOT_SECRET': ['root secret of web app', myUtils.genNumPass()]
       'DEFAULT_APP': ['default app of web app', 'user']
     , (err, answers) ->
