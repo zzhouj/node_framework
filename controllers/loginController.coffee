@@ -1,5 +1,4 @@
 express = require 'express'
-User = require '../models/user'
 _ = require 'underscore'
 config = require '../config'
 
