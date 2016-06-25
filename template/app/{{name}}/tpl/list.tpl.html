@@ -1,5 +1,5 @@
 <div class="panel panel-default">
-    <div class="panel-body">
+    <div class="panel-heading">
         <form class="form-inline">
             <div class="form-group">
                 <label for="criteria">{{label}}：</label>
@@ -9,18 +9,20 @@
             <a class="btn btn-primary" href="" role="button" ng-click="new()">新增</a>
         </form>
     </div>
-    <table class="table table-bordered table-hover table-striped">
-        <thead>
-        <tr>
-            <td>{{label}}</td>
-            <td>{{label}}</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>{{label}}</td>
-            <td>{{label}}</td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="panel-body">
+        <table class="table table-bordered table-hover table-striped">
+            <thead>
+            <tr>
+                <td>{{label}}</td>
+                <td>{{label}}</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>{{label}}</td>
+                <td>{{label}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
