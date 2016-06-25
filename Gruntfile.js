@@ -80,6 +80,17 @@
           src: ['dist/<%= pkg.name %>/**/*.coffee.js'],
           ext: '.js'
         }
+      },
+      compress: {
+        dist: {
+          options: {
+            archive: 'dist/<%= pkg.name %>_<%= grunt.template.today("yyyy-mm-dd") %>.tar.gz',
+            mode: 'tgz'
+          },
+          expand: true,
+          cwd: 'dist/',
+          src: '**'
+        }
       }
     });
     grunt.registerMultiTask('init', function() {
@@ -190,7 +201,8 @@
     grunt.loadNpmTasks('grunt-contrib-coffee');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    return grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js']);
+    grunt.loadNpmTasks('grunt-contrib-compress');
+    return grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'compress:dist']);
   };
 
 }).call(this);
