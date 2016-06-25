@@ -26,3 +26,7 @@ Usage
 	is equal to:
 
 		> grunt add
+
+5. export
+
+		> grunt dist
