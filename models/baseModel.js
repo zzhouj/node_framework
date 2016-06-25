@@ -134,7 +134,7 @@
 
     BaseModel.prototype.createTableSql = function() {
       var sql;
-      sql = " CREATE TABLE " + (mysql.escapeId(this.table.name)) + " ( \n";
+      sql = "CREATE TABLE " + (mysql.escapeId(this.table.name)) + " (\n";
       _.each(this.table.schema, (function(_this) {
         return function(type, field) {
           var mysqlType, option, _ref;
@@ -146,12 +146,12 @@
           } else if (type === Date) {
             mysqlType = "datetime";
           }
-          return sql += " \t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNULL ? '' : 'NOT NULL') + ", \n";
+          return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNULL ? '' : 'NOT NULL') + ",\n";
         };
       })(this));
-      sql += " \t" + (mysql.escapeId(this.table.id)) + " bigint(20) NOT NULL AUTO_INCREMENT, \n";
-      sql += " \tPRIMARY KEY (" + (mysql.escapeId(this.table.id)) + ") \n";
-      return sql += " ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ";
+      sql += "\t" + (mysql.escapeId(this.table.id)) + " bigint(20) NOT NULL AUTO_INCREMENT,\n";
+      sql += "\tPRIMARY KEY (" + (mysql.escapeId(this.table.id)) + ")\n";
+      return sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n";
     };
 
     return BaseModel;

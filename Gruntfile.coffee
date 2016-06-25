@@ -79,6 +79,11 @@ module.exports = (grunt) ->
         expand: true
         cwd: 'dist/'
         src: '**'
+    sql:
+      models:
+        cwd: 'models/'
+        src: ['**.js', '!baseModel.js']
+        dest: 'sql/'
 
   grunt.registerMultiTask 'init', ->
     done = @async()
@@ -168,3 +173,16 @@ module.exports = (grunt) ->
     'clean:coffee_js'
     'compress:dist'
   ]
+
+  grunt.registerMultiTask 'sql', ->
+    _.each @files, (file) ->
+      _.each file.src, (srcFile) ->
+        destFile = path.join file.dest, srcFile.replace /\.js$/, '.sql'
+        srcFile = path.join file.cwd, srcFile
+        try
+          model = require "./#{srcFile}"
+        catch e
+        sql = model?.createTableSql?()
+        if sql
+          grunt.log.writeln "writing >> #{destFile}"
+          grunt.file.write destFile, sql

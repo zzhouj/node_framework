@@ -91,6 +91,13 @@
           cwd: 'dist/',
           src: '**'
         }
+      },
+      sql: {
+        models: {
+          cwd: 'models/',
+          src: ['**.js', '!baseModel.js'],
+          dest: 'sql/'
+        }
       }
     });
     grunt.registerMultiTask('init', function() {
@@ -202,7 +209,26 @@
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    return grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'compress:dist']);
+    grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'compress:dist']);
+    return grunt.registerMultiTask('sql', function() {
+      return _.each(this.files, function(file) {
+        return _.each(file.src, function(srcFile) {
+          var destFile, e, model, sql;
+          destFile = path.join(file.dest, srcFile.replace(/\.js$/, '.sql'));
+          srcFile = path.join(file.cwd, srcFile);
+          try {
+            model = require("./" + srcFile);
+          } catch (_error) {
+            e = _error;
+          }
+          sql = model != null ? typeof model.createTableSql === "function" ? model.createTableSql() : void 0 : void 0;
+          if (sql) {
+            grunt.log.writeln("writing >> " + destFile);
+            return grunt.file.write(destFile, sql);
+          }
+        });
+      });
+    });
   };
 
 }).call(this);

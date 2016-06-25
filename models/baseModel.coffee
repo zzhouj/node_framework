@@ -85,7 +85,7 @@ class BaseModel
       cb err, result
 
   createTableSql: ->
-    sql = " CREATE TABLE #{mysql.escapeId @table.name} ( \n"
+    sql = "CREATE TABLE #{mysql.escapeId @table.name} (\n"
     _.each @table.schema, (type, field) =>
       option = @table.schemaOptions?[field] || {}
       if type == String
@@ -94,9 +94,9 @@ class BaseModel
         mysqlType = "bigint(#{option.size || 20})"
       else if type == Date
         mysqlType = "datetime"
-      sql += " \t#{mysql.escapeId field} #{mysqlType} #{if option.isNULL then '' else 'NOT NULL'}, \n"
-    sql += " \t#{mysql.escapeId @table.id} bigint(20) NOT NULL AUTO_INCREMENT, \n"
-    sql += " \tPRIMARY KEY (#{mysql.escapeId @table.id}) \n"
-    sql += " ) ENGINE=InnoDB DEFAULT CHARSET=utf8 "
+      sql += "\t#{mysql.escapeId field} #{mysqlType} #{if option.isNULL then '' else 'NOT NULL'},\n"
+    sql += "\t#{mysql.escapeId @table.id} bigint(20) NOT NULL AUTO_INCREMENT,\n"
+    sql += "\tPRIMARY KEY (#{mysql.escapeId @table.id})\n"
+    sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"
 
 module.exports = BaseModel
