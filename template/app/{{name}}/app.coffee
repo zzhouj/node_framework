@@ -1,6 +1,6 @@
 app = angular.module 'app', ['ngRoute', 'controllers']
 
-app.config ($routeProvider) ->
+app.config ['$routeProvider', ($routeProvider) ->
   $routeProvider.when '/',
     controller: 'ListController'
     templateUrl: '/app/{{name}}/tpl/list.tpl.html'
@@ -10,3 +10,4 @@ app.config ($routeProvider) ->
   $routeProvider.when '/new',
     controller: 'NewController'
     templateUrl: '/app/{{name}}/tpl/edit.tpl.html'
+]

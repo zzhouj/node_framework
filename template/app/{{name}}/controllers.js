@@ -4,15 +4,19 @@
 
   controllers = angular.module('controllers', ['services', 'ui.bootstrap']);
 
-  controllers.controller('ListController', function($scope, Model) {
-    return $scope.criteria = {};
-  });
+  controllers.controller('ListController', [
+    '$scope', 'Model', function($scope, Model) {
+      return $scope.criteria = {};
+    }
+  ]);
 
-  controllers.controller('EditController', function($scope, Model, $routeParams) {
-    var id;
-    return id = $routeParams.id, $routeParams;
-  });
+  controllers.controller('EditController', [
+    '$scope', 'Model', '$routeParams', function($scope, Model, $routeParams) {
+      var id;
+      return id = $routeParams.id, $routeParams;
+    }
+  ]);
 
-  controllers.controller('NewController', function($scope, Model) {});
+  controllers.controller('NewController', ['$scope', 'Model', function($scope, Model) {}]);
 
 }).call(this);

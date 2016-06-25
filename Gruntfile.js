@@ -13,6 +13,7 @@
   module.exports = function(grunt) {
     var addTask;
     grunt.initConfig({
+      pkg: grunt.file.readJSON('package.json'),
       init: {
         files: ['package.json', 'restart.sh', 'config/index.json', 'routes/index.coffee', 'routes/index.js']
       },
@@ -52,6 +53,32 @@
           src: 'nav.html',
           dest: 'views/baseApp.ejs',
           replaceText: '<!--{{nav}}-->'
+        }
+      },
+      clean: {
+        dist: ['dist/'],
+        coffee_js: ['dist/**/*.coffee.js']
+      },
+      coffee: {
+        dist: {
+          expand: true,
+          src: ['{controllers,models,permissions,public,restful,routes,utils}/**/*.coffee'],
+          dest: 'dist/<%= pkg.name %>/',
+          ext: '.coffee.js'
+        }
+      },
+      copy: {
+        dist: {
+          expand: true,
+          src: ['{bin,config,views,public}/**', '!**/*.{coffee,js}', 'public/javascripts/vendor/**/*.js', 'app.js', 'package.json', 'restart.sh'],
+          dest: 'dist/<%= pkg.name %>/'
+        }
+      },
+      uglify: {
+        dist: {
+          expand: true,
+          src: ['dist/<%= pkg.name %>/**/*.coffee.js'],
+          ext: '.js'
         }
       }
     });
@@ -123,7 +150,7 @@
         })(this));
       }
     });
-    return addTask = function(name, label, done) {
+    addTask = function(name, label, done) {
       var replaceText;
       grunt.log.writeln(JSON.stringify(this));
       replaceText = this.data.replaceText;
@@ -159,6 +186,11 @@
       }
       return typeof done === "function" ? done() : void 0;
     };
+    grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-contrib-coffee');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+    return grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js']);
   };
 
 }).call(this);

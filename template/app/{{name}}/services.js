@@ -4,12 +4,14 @@
 
   services = angular.module('services', ['ngResource']);
 
-  services.factory('Model', function($resource) {
-    return $resource('/rest/{{name}}/:id', null, {
-      update: {
-        method: 'PUT'
-      }
-    });
-  });
+  services.factory('Model', [
+    '$resource', function($resource) {
+      return $resource('/rest/{{name}}/:id', null, {
+        update: {
+          method: 'PUT'
+        }
+      });
+    }
+  ]);
 
 }).call(this);
