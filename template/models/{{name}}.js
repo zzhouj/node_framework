@@ -10,6 +10,11 @@
     orderBy: 'name',
     schema: {
       name: String
+    },
+    schemaOptions: {
+      name: {
+        size: 45
+      }
     }
   });
 

@@ -1,6 +1,7 @@
-mysqlPool = require '../utils/mysqlPool'
 mysql = require 'mysql'
 dateformat = require 'dateformat'
+_ = require 'underscore'
+mysqlPool = require '../utils/mysqlPool'
 config = require '../config'
 
 class BaseModel
@@ -82,5 +83,20 @@ class BaseModel
       sql += " , " if i < (fields.length - 1)
     mysqlPool.query sql, (err, result) ->
       cb err, result
+
+  createTableSql: ->
+    sql = " CREATE TABLE #{mysql.escapeId @table.name} ( \n"
+    _.each @table.schema, (type, field) =>
+      option = @table.schemaOptions?[field] || {}
+      if type == String
+        mysqlType = "varchar(#{option.size || 45})"
+      else if type = Number
+        mysqlType = "bigint(#{option.size || 20})"
+      else if type == Date
+        mysqlType = "datetime"
+      sql += " \t#{mysql.escapeId field} #{mysqlType} #{if option.isNULL then '' else 'NOT NULL'}, \n"
+    sql += " \t#{mysql.escapeId @table.id} bigint(20) NOT NULL AUTO_INCREMENT, \n"
+    sql += " \tPRIMARY KEY (#{mysql.escapeId @table.id}) \n"
+    sql += " ) ENGINE=InnoDB DEFAULT CHARSET=utf8 "
 
 module.exports = BaseModel
