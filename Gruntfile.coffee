@@ -248,8 +248,14 @@ module.exports = (grunt) ->
       "<td>#{label}</td>"
     ).join("\n#{indent}")
     replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), (field) ->
-      "<td>{{item.#{field}#{if options[field]?.type == Number then ' | number' else ''}}}</td>"
+      if options[field]?.type == Number
+        "<td>{{item.#{field} | number}}</td>"
+      else if options[field]?.type == Date
+        "<td>{{item.#{field} | date:'yyyy-MM-dd HH:mm:ss'}}</td>"
+      else
+        "<td>{{item.#{field}}}</td>"
     ).join("\n#{indent}")
+    labels = _.omit labels, 'createTime', 'updateTime'
     indent = '        '
     replaceMap["#{indent}<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, (label, field) ->
       typeAttr = if options[field]?.type == Number then ' type="number"' else ''

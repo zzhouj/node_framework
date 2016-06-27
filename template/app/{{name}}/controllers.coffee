@@ -40,7 +40,9 @@ controllers.controller 'EditController', ['$scope', '$modalInstance', 'Model', (
   {id} = $scope.item
   $scope.item = Model.get {id} if id
   $scope.save = ->
-    action = if id then '$update' else '$save'
+    action = if $scope.isNew then '$save' else '$update'
+    $scope.item.createTime = new Date() unless $scope.item.createTime
+    $scope.item.updateTime = new Date()
     $scope.item[action]? {id}, ->
       alert '保存成功'
       $modalInstance.close('ok')

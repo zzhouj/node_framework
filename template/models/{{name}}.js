@@ -12,11 +12,14 @@
         type: String,
         size: 45
       },
-      create: Date
+      createTime: Date,
+      updateTime: Date
     },
     labels: {
       $model: '{{label}}',
-      name: '名称'
+      name: '名称',
+      createTime: '创建时间',
+      updateTime: '更新时间'
     }
   });
 

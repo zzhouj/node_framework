@@ -8,7 +8,10 @@ module.exports = new BaseModel
     name:
       type: String # String | Number | Date
       size: 45 # default: varchar(45) | bigint(20)
-    create: Date
+    createTime: Date
+    updateTime: Date
   labels:
     $model: '{{label}}'
     name: '名称'
+    createTime: '创建时间'
+    updateTime: '更新时间'

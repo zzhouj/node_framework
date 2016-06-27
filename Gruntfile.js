@@ -330,9 +330,16 @@
         return "<td>" + label + "</td>";
       }).join("\n" + indent);
       replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), function(field) {
-        var _ref1;
-        return "<td>{{item." + field + (((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number ? ' | number' : '') + "}}</td>";
+        var _ref1, _ref2;
+        if (((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number) {
+          return "<td>{{item." + field + " | number}}</td>";
+        } else if (((_ref2 = options[field]) != null ? _ref2.type : void 0) === Date) {
+          return "<td>{{item." + field + " | date:'yyyy-MM-dd HH:mm:ss'}}</td>";
+        } else {
+          return "<td>{{item." + field + "}}</td>";
+        }
       }).join("\n" + indent);
+      labels = _.omit(labels, 'createTime', 'updateTime');
       indent = '        ';
       replaceMap["" + indent + "<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, function(label, field) {
         var requireAttr, typeAttr, _ref1, _ref2;

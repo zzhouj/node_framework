@@ -72,7 +72,11 @@
       }
       $scope.save = function() {
         var action, _base;
-        action = id ? '$update' : '$save';
+        action = $scope.isNew ? '$save' : '$update';
+        if (!$scope.item.createTime) {
+          $scope.item.createTime = new Date();
+        }
+        $scope.item.updateTime = new Date();
         return typeof (_base = $scope.item)[action] === "function" ? _base[action]({
           id: id
         }, function() {
