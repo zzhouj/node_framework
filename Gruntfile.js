@@ -269,7 +269,7 @@
       });
     });
     return tplTask = function(candidate) {
-      var labels, model, replaceMap, _ref;
+      var indent, labels, model, replaceMap, _ref;
       model = require("./" + candidate.srcFile);
       labels = ((_ref = model.table) != null ? _ref.labels : void 0) || {};
       replaceMap = {};
@@ -279,13 +279,18 @@
       if (labels.$model) {
         replaceMap['{{model.label}}'] = labels.$model;
       }
-      delete labels.$model;
+      labels = _.omit(labels, '$model');
+      indent = '                ';
       replaceMap['<td>{{field.label}}</td>'] = _.map(_.values(labels), function(label) {
         return "<td>" + label + "</td>";
-      }).join('\n                ');
+      }).join("\n" + indent);
       replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), function(field) {
         return "<td>{{item." + field + "}}</td>";
-      }).join('\n                ');
+      }).join("\n" + indent);
+      indent = '        ';
+      replaceMap["" + indent + "<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, function(label, field) {
+        return "" + indent + "<div class=\"form-group\">\n" + indent + "    <label for=\"" + field + "\">" + label + "：</label>\n" + indent + "    <input class=\"form-control\" id=\"" + field + "\" ng-model=\"item." + field + "\">\n" + indent + "</div>";
+      }).join('\n');
       return _.each(candidate.destFiles, function(destFile) {
         return _.each(replaceMap, function(withText, replaceText) {
           return grunt.file.write(destFile, myUtils.replaceAll(grunt.file.read(destFile), replaceText, withText));

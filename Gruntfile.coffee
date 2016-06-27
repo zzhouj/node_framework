@@ -218,13 +218,23 @@ module.exports = (grunt) ->
     replaceMap = {}
     replaceMap['{{name.label}}'] = labels.name if labels.name
     replaceMap['{{model.label}}'] = labels.$model if labels.$model
-    delete labels.$model
+    labels = _.omit labels, '$model'
+    indent = '                '
     replaceMap['<td>{{field.label}}</td>'] = _.map(_.values(labels), (label) ->
       "<td>#{label}</td>"
-    ).join('\n                ')
+    ).join("\n#{indent}")
     replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), (field) ->
       "<td>{{item.#{field}}}</td>"
-    ).join('\n                ')
+    ).join("\n#{indent}")
+    indent = '        '
+    replaceMap["#{indent}<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, (label, field) ->
+      """
+      #{indent}<div class="form-group">
+      #{indent}    <label for="#{field}">#{label}：</label>
+      #{indent}    <input class="form-control" id="#{field}" ng-model="item.#{field}">
+      #{indent}</div>
+      """
+    ).join('\n')
     _.each candidate.destFiles, (destFile) ->
       _.each replaceMap, (withText, replaceText) ->
         grunt.file.write destFile, myUtils.replaceAll grunt.file.read(destFile), replaceText, withText
