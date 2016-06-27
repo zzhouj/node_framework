@@ -6,7 +6,12 @@
 
   controllers.controller('ListController', [
     '$scope', 'Model', function($scope, Model) {
-      return $scope.criteria = {};
+      var query;
+      $scope.criteria = {};
+      query = function() {
+        return $scope.collection = Model.query({});
+      };
+      return query();
     }
   ]);
 

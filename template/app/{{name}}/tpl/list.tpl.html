@@ -2,7 +2,7 @@
     <div class="panel-heading">
         <form class="form-inline">
             <div class="form-group">
-                <label for="criteria">{{label}}：</label>
+                <label for="criteria">{{criteria.label}}：</label>
                 <input class="form-control" id="criteria" ng-model="criteria.name">
             </div>
             &nbsp;
@@ -13,14 +13,12 @@
         <table class="table table-bordered table-hover table-striped">
             <thead>
             <tr>
-                <td>{{label}}</td>
-                <td>{{label}}</td>
+                <td>{{field.label}}</td>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>{{label}}</td>
-                <td>{{label}}</td>
+            <tr ng-repeat="item in collection">
+                <td>{{field.value}}</td>
             </tr>
             </tbody>
         </table>
