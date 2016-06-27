@@ -269,9 +269,21 @@
       });
     });
     return tplTask = function(candidate) {
-      var indent, labels, model, replaceMap, _ref;
+      var indent, labels, model, options, replaceMap, schema, _ref;
       model = require("./" + candidate.srcFile);
       labels = ((_ref = model.table) != null ? _ref.labels : void 0) || {};
+      schema = model.table.schema;
+      options = _.mapObject(labels, function(label, field) {
+        var option;
+        option = schema != null ? schema[field] : void 0;
+        option = (option != null ? option.type : void 0) != null ? option : {
+          type: option
+        };
+        if (option.isNotNull == null) {
+          option.isNotNull = true;
+        }
+        return option;
+      });
       replaceMap = {};
       if (labels.name) {
         replaceMap['{{name.label}}'] = labels.name;
@@ -285,11 +297,15 @@
         return "<td>" + label + "</td>";
       }).join("\n" + indent);
       replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), function(field) {
-        return "<td>{{item." + field + "}}</td>";
+        var _ref1;
+        return "<td>{{item." + field + (((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number ? ' | number' : '') + "}}</td>";
       }).join("\n" + indent);
       indent = '        ';
       replaceMap["" + indent + "<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, function(label, field) {
-        return "" + indent + "<div class=\"form-group\">\n" + indent + "    <label for=\"" + field + "\">" + label + "：</label>\n" + indent + "    <input class=\"form-control\" id=\"" + field + "\" ng-model=\"item." + field + "\">\n" + indent + "</div>";
+        var requireAttr, typeAttr, _ref1, _ref2;
+        typeAttr = ((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number ? ' type="number"' : '';
+        requireAttr = ((_ref2 = options[field]) != null ? _ref2.isNotNull : void 0) ? ' required' : '';
+        return "" + indent + "<div class=\"form-group\">\n" + indent + "    <label for=\"" + field + "\">" + label + "：</label>\n" + indent + "    <input class=\"form-control\" id=\"" + field + "\" ng-model=\"item." + field + "\"" + typeAttr + requireAttr + ">\n" + indent + "</div>";
       }).join('\n');
       return _.each(candidate.destFiles, function(destFile) {
         return _.each(replaceMap, function(withText, replaceText) {

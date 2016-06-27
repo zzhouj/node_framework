@@ -142,20 +142,19 @@
       var sql;
       sql = "CREATE TABLE " + (mysql.escapeId(this.table.name)) + " (\n";
       _.each(this.table.schema, (function(_this) {
-        return function(type, field) {
-          var mysqlType, option;
-          option = (type != null ? type.type : void 0) != null ? type : {};
+        return function(option, field) {
+          var mysqlType;
+          option = (option != null ? option.type : void 0) != null ? option : {
+            type: option
+          };
           if (option.isNotNull == null) {
             option.isNotNull = true;
           }
-          if ((type != null ? type.type : void 0) != null) {
-            type = type.type;
-          }
-          if (type === String) {
+          if (option.type === String) {
             mysqlType = "varchar(" + (option.size || 45) + ")";
-          } else if (type = Number) {
+          } else if (option.type = Number) {
             mysqlType = "bigint(" + (option.size || 20) + ")";
-          } else if (type === Date) {
+          } else if (option.type === Date) {
             mysqlType = "datetime";
           }
           return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNotNull ? 'NOT NULL' : '') + ",\n";

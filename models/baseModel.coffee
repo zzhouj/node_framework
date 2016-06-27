@@ -88,15 +88,14 @@ class BaseModel
 
   createTableSql: ->
     sql = "CREATE TABLE #{mysql.escapeId @table.name} (\n"
-    _.each @table.schema, (type, field) =>
-      option = if type?.type? then type else {}
+    _.each @table.schema, (option, field) =>
+      option = if option?.type? then option else {type: option}
       option.isNotNull = true unless option.isNotNull?
-      type = type.type if type?.type?
-      if type == String
+      if option.type == String
         mysqlType = "varchar(#{option.size || 45})"
-      else if type = Number
+      else if option.type = Number
         mysqlType = "bigint(#{option.size || 20})"
-      else if type == Date
+      else if option.type == Date
         mysqlType = "datetime"
       sql += "\t#{mysql.escapeId field} #{mysqlType} #{if option.isNotNull then 'NOT NULL' else ''},\n"
     sql += "\t#{mysql.escapeId @table.id} bigint(20) NOT NULL AUTO_INCREMENT,\n"

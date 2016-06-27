@@ -215,6 +215,12 @@ module.exports = (grunt) ->
   tplTask = (candidate) ->
     model = require "./#{candidate.srcFile}"
     labels = model.table?.labels || {}
+    {schema} = model.table
+    options = _.mapObject labels, (label, field) ->
+      option = schema?[field]
+      option = if option?.type? then option else {type: option}
+      option.isNotNull = true unless option.isNotNull?
+      option
     replaceMap = {}
     replaceMap['{{name.label}}'] = labels.name if labels.name
     replaceMap['{{model.label}}'] = labels.$model if labels.$model
@@ -224,14 +230,16 @@ module.exports = (grunt) ->
       "<td>#{label}</td>"
     ).join("\n#{indent}")
     replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), (field) ->
-      "<td>{{item.#{field}}}</td>"
+      "<td>{{item.#{field}#{if options[field]?.type == Number then ' | number' else ''}}}</td>"
     ).join("\n#{indent}")
     indent = '        '
     replaceMap["#{indent}<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, (label, field) ->
+      typeAttr = if options[field]?.type == Number then ' type="number"' else ''
+      requireAttr = if options[field]?.isNotNull then ' required' else ''
       """
       #{indent}<div class="form-group">
       #{indent}    <label for="#{field}">#{label}：</label>
-      #{indent}    <input class="form-control" id="#{field}" ng-model="item.#{field}">
+      #{indent}    <input class="form-control" id="#{field}" ng-model="item.#{field}"#{typeAttr}#{requireAttr}>
       #{indent}</div>
       """
     ).join('\n')
