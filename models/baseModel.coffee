@@ -21,7 +21,7 @@ class BaseModel
     if @table.orderBy
       sql += " ORDER BY #{@table.orderBy} "
     else
-      sql += " ORDER BY #{mysql.escapeId @table.id} "
+      sql += " ORDER BY #{mysql.escapeId @table.id} DESC "
     sql += " LIMIT #{page * config.pageSize}, #{config.pageSize} " if page?
     mysqlPool.query sql, (err, rows) ->
       cb err, rows

@@ -3,7 +3,7 @@ BaseModel = require './baseModel'
 module.exports = new BaseModel
   name: '{{name}}'
   id: 'id'
-  orderBy: 'name'
+#  orderBy: 'name'
   schema:
     name:
       type: String # String | Number | Date

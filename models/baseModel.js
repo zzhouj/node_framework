@@ -31,7 +31,7 @@
       if (this.table.orderBy) {
         sql += " ORDER BY " + this.table.orderBy + " ";
       } else {
-        sql += " ORDER BY " + (mysql.escapeId(this.table.id)) + " ";
+        sql += " ORDER BY " + (mysql.escapeId(this.table.id)) + " DESC ";
       }
       if (page != null) {
         sql += " LIMIT " + (page * config.pageSize) + ", " + config.pageSize + " ";

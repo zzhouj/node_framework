@@ -6,17 +6,9 @@
 
   app.config([
     '$routeProvider', function($routeProvider) {
-      $routeProvider.when('/', {
+      return $routeProvider.when('/', {
         controller: 'ListController',
         templateUrl: '/app/{{name}}/tpl/list.tpl.html'
-      });
-      $routeProvider.when('/edit/:id', {
-        controller: 'EditController',
-        templateUrl: '/app/{{name}}/tpl/edit.tpl.html'
-      });
-      return $routeProvider.when('/new', {
-        controller: 'NewController',
-        templateUrl: '/app/{{name}}/tpl/edit.tpl.html'
       });
     }
   ]);

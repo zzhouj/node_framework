@@ -5,26 +5,86 @@
   controllers = angular.module('controllers', ['services', 'ui.bootstrap']);
 
   controllers.controller('ListController', [
-    '$scope', 'Model', function($scope, Model) {
+    '$scope', '$rootScope', '$modal', 'Model', function($scope, $rootScope, $modal, Model) {
       var query;
       $scope.criteria = {};
-      query = function() {
-        return $scope.collection = Model.query({});
+      $scope.query = query = function() {
+        return $scope.collection = Model.query($scope.criteria);
       };
-      return query();
+      query();
+      $scope["new"] = function() {
+        var modalInstance;
+        modalInstance = $modal.open({
+          controller: 'EditController',
+          templateUrl: '/app/{{name}}/tpl/edit.tpl.html',
+          scope: _.extend($rootScope.$new(), {
+            isNew: true,
+            item: new Model()
+          })
+        });
+        return modalInstance.result.then(function() {
+          return query();
+        });
+      };
+      $scope.edit = function(item) {
+        var id, modalInstance;
+        id = item.id;
+        modalInstance = $modal.open({
+          controller: 'EditController',
+          templateUrl: '/app/{{name}}/tpl/edit.tpl.html',
+          scope: _.extend($rootScope.$new(), {
+            item: {
+              id: id
+            }
+          })
+        });
+        return modalInstance.result.then(function() {
+          return query();
+        });
+      };
+      return $scope["delete"] = function(item) {
+        var id, name;
+        id = item.id;
+        if (name = prompt("确定删除【" + item.name + "】吗（ID：" + id + "）？\n\n请输入" + item.name + "确定删除：")) {
+          if (name === item.name) {
+            return typeof item.$delete === "function" ? item.$delete({
+              id: id
+            }, function() {
+              alert('删除成功');
+              return query();
+            }, function(res) {
+              return alert("Error " + res.status + ": " + (JSON.stringify(res.data)));
+            }) : void 0;
+          }
+        }
+      };
     }
   ]);
 
   controllers.controller('EditController', [
-    '$scope', 'Model', '$routeParams', function($scope, Model, $routeParams) {
+    '$scope', '$modalInstance', 'Model', function($scope, $modalInstance, Model) {
       var id;
-      return id = $routeParams.id, $routeParams;
-    }
-  ]);
-
-  controllers.controller('NewController', [
-    '$scope', 'Model', function($scope, Model) {
-      return $scope.isNew = true;
+      id = $scope.item.id;
+      if (id) {
+        $scope.item = Model.get({
+          id: id
+        });
+      }
+      $scope.save = function() {
+        var action, _base;
+        action = id ? '$update' : '$save';
+        return typeof (_base = $scope.item)[action] === "function" ? _base[action]({
+          id: id
+        }, function() {
+          alert('保存成功');
+          return $modalInstance.close('ok');
+        }, function(res) {
+          return $scope.err = "Error " + res.status + ": " + (JSON.stringify(res.data));
+        }) : void 0;
+      };
+      return $scope.cancel = function() {
+        return $modalInstance.dismiss('cancel');
+      };
     }
   ]);
 

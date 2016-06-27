@@ -1,16 +1,52 @@
 controllers = angular.module 'controllers', ['services', 'ui.bootstrap']
 
-controllers.controller 'ListController', ['$scope', 'Model', ($scope, Model) ->
-  $scope.criteria = {}
-  query = ->
-    $scope.collection = Model.query {}
-  query()
+controllers.controller 'ListController', ['$scope', '$rootScope', '$modal', 'Model',
+  ($scope, $rootScope, $modal, Model) ->
+    $scope.criteria = {}
+
+    $scope.query = query = ->
+      $scope.collection = Model.query $scope.criteria
+    query()
+
+    $scope.new = ->
+      modalInstance = $modal.open
+        controller: 'EditController'
+        templateUrl: '/app/{{name}}/tpl/edit.tpl.html'
+        scope: _.extend $rootScope.$new(), {isNew: true, item: new Model()}
+      modalInstance.result.then ->
+        query()
+
+    $scope.edit = (item) ->
+      {id} = item
+      modalInstance = $modal.open
+        controller: 'EditController'
+        templateUrl: '/app/{{name}}/tpl/edit.tpl.html'
+        scope: _.extend $rootScope.$new(), {item: {id}}
+      modalInstance.result.then ->
+        query()
+
+    $scope.delete = (item) ->
+      {id} = item
+      if name = prompt "确定删除【#{item.name}】吗（ID：#{id}）？\n\n请输入#{item.name}确定删除："
+        if name == item.name
+          item.$delete? {id}, ->
+            alert '删除成功'
+            query()
+          , (res)->
+            alert "Error #{res.status}: #{JSON.stringify res.data}"
 ]
 
-controllers.controller 'EditController', ['$scope', 'Model', '$routeParams', ($scope, Model, $routeParams) ->
-  {id} = $routeParams
-]
+controllers.controller 'EditController', ['$scope', '$modalInstance', 'Model', ($scope, $modalInstance, Model) ->
+  {id} = $scope.item
+  $scope.item = Model.get {id} if id
+  $scope.save = ->
+    action = if id then '$update' else '$save'
+    $scope.item[action]? {id}, ->
+      alert '保存成功'
+      $modalInstance.close('ok')
+    , (res)->
+      $scope.err = "Error #{res.status}: #{JSON.stringify res.data}"
 
-controllers.controller 'NewController', ['$scope', 'Model', ($scope, Model) ->
-  $scope.isNew = true
+  $scope.cancel = ->
+    $modalInstance.dismiss('cancel')
 ]
