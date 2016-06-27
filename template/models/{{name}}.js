@@ -13,8 +13,11 @@
         type: String,
         size: 45
       },
-      create: Date,
-      flag: Number
+      create: Date
+    },
+    labels: {
+      $model: '{{label}}',
+      name: '名称'
     }
   });
 

@@ -6,7 +6,9 @@ module.exports = new BaseModel
   orderBy: 'name'
   schema:
     name:
-      type: String
+      type: String # String | Number | Date
       size: 45 # default: varchar(45) | bigint(20)
     create: Date
-    flag: Number
+  labels:
+    $model: '{{label}}'
+    name: '名称'
