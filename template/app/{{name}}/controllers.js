@@ -22,6 +22,10 @@
     }
   ]);
 
-  controllers.controller('NewController', ['$scope', 'Model', function($scope, Model) {}]);
+  controllers.controller('NewController', [
+    '$scope', 'Model', function($scope, Model) {
+      return $scope.isNew = true;
+    }
+  ]);
 
 }).call(this);

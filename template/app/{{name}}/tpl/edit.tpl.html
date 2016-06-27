@@ -1,11 +1,11 @@
 <div class="modal-header">
-    <h3 class="modal-title">新增/编辑{{label}}</h3>
+    <h3 class="modal-title">{{isNew ? '新增' : '编辑'}}{{model.label}}</h3>
 </div>
 <div class="modal-body">
     <form>
         <div class="form-group">
-            <label for="name">{{label}}：</label>
-            <input class="form-control" id="name" ng-model="{{name}}.name" required>
+            <label for="{{field.name}}">{{field.label}}：</label>
+            <input class="form-control" id="{{field.name}}" ng-model="{{field.value}}">
         </div>
     </form>
 </div>

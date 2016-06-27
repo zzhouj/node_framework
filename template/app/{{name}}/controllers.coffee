@@ -12,4 +12,5 @@ controllers.controller 'EditController', ['$scope', 'Model', '$routeParams', ($s
 ]
 
 controllers.controller 'NewController', ['$scope', 'Model', ($scope, Model) ->
+  $scope.isNew = true
 ]
