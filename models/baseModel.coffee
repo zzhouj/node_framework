@@ -45,6 +45,7 @@ class BaseModel
           """
     fields = []
     for own field, type of @table.schema
+      type = type.type if type?.type?
       fields.push {field, type} if item[field]?
     for {field, type}, i in fields
       value = item[field]
@@ -74,6 +75,7 @@ class BaseModel
     fields = []
     fields.push {field: @table.id, type: String} if item[@table.id]
     for own field, type of @table.schema
+      type = type.type if type?.type?
       fields.push {field, type} if item[field]?
     for {field, type}, i in fields
       value = item[field]
@@ -87,14 +89,16 @@ class BaseModel
   createTableSql: ->
     sql = "CREATE TABLE #{mysql.escapeId @table.name} (\n"
     _.each @table.schema, (type, field) =>
-      option = @table.schemaOptions?[field] || {}
+      option = if type?.type? then type else {}
+      option.isNotNull = true unless option.isNotNull?
+      type = type.type if type?.type?
       if type == String
         mysqlType = "varchar(#{option.size || 45})"
       else if type = Number
         mysqlType = "bigint(#{option.size || 20})"
       else if type == Date
         mysqlType = "datetime"
-      sql += "\t#{mysql.escapeId field} #{mysqlType} #{if option.isNULL then '' else 'NOT NULL'},\n"
+      sql += "\t#{mysql.escapeId field} #{mysqlType} #{if option.isNotNull then 'NOT NULL' else ''},\n"
     sql += "\t#{mysql.escapeId @table.id} bigint(20) NOT NULL AUTO_INCREMENT,\n"
     sql += "\tPRIMARY KEY (#{mysql.escapeId @table.id})\n"
     sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"

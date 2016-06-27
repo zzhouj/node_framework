@@ -63,6 +63,9 @@
       for (field in _ref) {
         if (!__hasProp.call(_ref, field)) continue;
         type = _ref[field];
+        if ((type != null ? type.type : void 0) != null) {
+          type = type.type;
+        }
         if (item[field] != null) {
           fields.push({
             field: field,
@@ -109,6 +112,9 @@
       for (field in _ref) {
         if (!__hasProp.call(_ref, field)) continue;
         type = _ref[field];
+        if ((type != null ? type.type : void 0) != null) {
+          type = type.type;
+        }
         if (item[field] != null) {
           fields.push({
             field: field,
@@ -137,8 +143,14 @@
       sql = "CREATE TABLE " + (mysql.escapeId(this.table.name)) + " (\n";
       _.each(this.table.schema, (function(_this) {
         return function(type, field) {
-          var mysqlType, option, _ref;
-          option = ((_ref = _this.table.schemaOptions) != null ? _ref[field] : void 0) || {};
+          var mysqlType, option;
+          option = (type != null ? type.type : void 0) != null ? type : {};
+          if (option.isNotNull == null) {
+            option.isNotNull = true;
+          }
+          if ((type != null ? type.type : void 0) != null) {
+            type = type.type;
+          }
           if (type === String) {
             mysqlType = "varchar(" + (option.size || 45) + ")";
           } else if (type = Number) {
@@ -146,7 +158,7 @@
           } else if (type === Date) {
             mysqlType = "datetime";
           }
-          return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNULL ? '' : 'NOT NULL') + ",\n";
+          return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNotNull ? 'NOT NULL' : '') + ",\n";
         };
       })(this));
       sql += "\t" + (mysql.escapeId(this.table.id)) + " bigint(20) NOT NULL AUTO_INCREMENT,\n";

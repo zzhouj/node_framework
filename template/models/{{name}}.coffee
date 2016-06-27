@@ -5,7 +5,7 @@ module.exports = new BaseModel
   id: 'id'
   orderBy: 'name'
   schema:
-    name: String
-  schemaOptions:
     name:
-      size: 45
+      type: String
+    create: Date
+    flag: Number

@@ -9,12 +9,12 @@
     id: 'id',
     orderBy: 'name',
     schema: {
-      name: String
-    },
-    schemaOptions: {
       name: {
+        type: String,
         size: 45
-      }
+      },
+      create: Date,
+      flag: Number
     }
   });
 
