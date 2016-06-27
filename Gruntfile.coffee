@@ -71,6 +71,12 @@ module.exports = (grunt) ->
         expand: true
         src: ['dist/<%= pkg.name %>/**/*.coffee.js']
         ext: '.js'
+    fix:
+      config:
+        options:
+          mysqlHost: '10.6.22.97'
+          redisHost: '10.6.25.201'
+        src: 'dist/<%= pkg.name %>/config/index.json'
     compress:
       dist:
         options:
@@ -109,7 +115,7 @@ module.exports = (grunt) ->
     , (err, answers) ->
       grunt.log.error err if err
       return done false if err
-      grunt.log.writeln JSON.stringify answers
+      grunt.log.writeln JSON.stringify answers, null, 4
       _.each filesSrc, (file) ->
         content = grunt.file.read file
         if content
@@ -131,7 +137,7 @@ module.exports = (grunt) ->
       , (err, answers) =>
         grunt.log.error err if err
         return done false if err
-        grunt.log.writeln JSON.stringify answers
+        grunt.log.writeln JSON.stringify answers, null, 4
         {name, label} = answers
         grunt.config 'add.name', name
         grunt.config 'add.label', label
@@ -172,8 +178,20 @@ module.exports = (grunt) ->
     'coffee:dist'
     'uglify:dist'
     'clean:coffee_js'
+    'fix:config'
     'compress:dist'
   ]
+
+  grunt.registerMultiTask 'fix', ->
+    return grunt.log.error 'no options' unless @data.options
+    {mysqlHost, redisHost} = @data.options
+    return grunt.log.error 'invalid options' unless mysqlHost and redisHost
+    for src in @filesSrc
+      config = grunt.file.readJSON src
+      if config
+        config.mysql.host = mysqlHost
+        config.redis.host = redisHost
+        grunt.file.write src, JSON.stringify config, null, 4
 
   grunt.registerMultiTask 'sql', ->
     _.each @files, (file) ->

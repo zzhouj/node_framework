@@ -81,6 +81,15 @@
           ext: '.js'
         }
       },
+      fix: {
+        config: {
+          options: {
+            mysqlHost: '10.6.22.97',
+            redisHost: '10.6.25.201'
+          },
+          src: 'dist/<%= pkg.name %>/config/index.json'
+        }
+      },
       compress: {
         dist: {
           options: {
@@ -131,7 +140,7 @@
         if (err) {
           return done(false);
         }
-        grunt.log.writeln(JSON.stringify(answers));
+        grunt.log.writeln(JSON.stringify(answers, null, 4));
         _.each(filesSrc, function(file) {
           var content;
           content = grunt.file.read(file);
@@ -164,7 +173,7 @@
             if (err) {
               return done(false);
             }
-            grunt.log.writeln(JSON.stringify(answers));
+            grunt.log.writeln(JSON.stringify(answers, null, 4));
             name = answers.name, label = answers.label;
             grunt.config('add.name', name);
             grunt.config('add.label', label);
@@ -211,7 +220,31 @@
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'compress:dist']);
+    grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'fix:config', 'compress:dist']);
+    grunt.registerMultiTask('fix', function() {
+      var config, mysqlHost, redisHost, src, _i, _len, _ref, _ref1, _results;
+      if (!this.data.options) {
+        return grunt.log.error('no options');
+      }
+      _ref = this.data.options, mysqlHost = _ref.mysqlHost, redisHost = _ref.redisHost;
+      if (!(mysqlHost && redisHost)) {
+        return grunt.log.error('invalid options');
+      }
+      _ref1 = this.filesSrc;
+      _results = [];
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        src = _ref1[_i];
+        config = grunt.file.readJSON(src);
+        if (config) {
+          config.mysql.host = mysqlHost;
+          config.redis.host = redisHost;
+          _results.push(grunt.file.write(src, JSON.stringify(config, null, 4)));
+        } else {
+          _results.push(void 0);
+        }
+      }
+      return _results;
+    });
     grunt.registerMultiTask('sql', function() {
       return _.each(this.files, function(file) {
         return _.each(file.src, function(srcFile) {
