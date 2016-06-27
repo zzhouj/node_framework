@@ -213,6 +213,18 @@ module.exports = (grunt) ->
         done()
 
   tplTask = (candidate) ->
-    try
-      model = require "./#{srcFile}"
-    catch e
+    model = require "./#{candidate.srcFile}"
+    labels = model.table?.labels || {}
+    replaceMap = {}
+    replaceMap['{{name.label}}'] = labels.name if labels.name
+    replaceMap['{{model.label}}'] = labels.$model if labels.$model
+    delete labels.$model
+    replaceMap['<td>{{field.label}}</td>'] = _.map(_.values(labels), (label) ->
+      "<td>#{label}</td>"
+    ).join('\n                ')
+    replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), (field) ->
+      "<td>{{item.#{field}}}</td>"
+    ).join('\n                ')
+    _.each candidate.destFiles, (destFile) ->
+      _.each replaceMap, (withText, replaceText) ->
+        grunt.file.write destFile, myUtils.replaceAll grunt.file.read(destFile), replaceText, withText

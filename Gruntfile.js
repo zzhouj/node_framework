@@ -269,12 +269,28 @@
       });
     });
     return tplTask = function(candidate) {
-      var e, model;
-      try {
-        return model = require("./" + srcFile);
-      } catch (_error) {
-        e = _error;
+      var labels, model, replaceMap, _ref;
+      model = require("./" + candidate.srcFile);
+      labels = ((_ref = model.table) != null ? _ref.labels : void 0) || {};
+      replaceMap = {};
+      if (labels.name) {
+        replaceMap['{{name.label}}'] = labels.name;
       }
+      if (labels.$model) {
+        replaceMap['{{model.label}}'] = labels.$model;
+      }
+      delete labels.$model;
+      replaceMap['<td>{{field.label}}</td>'] = _.map(_.values(labels), function(label) {
+        return "<td>" + label + "</td>";
+      }).join('\n                ');
+      replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), function(field) {
+        return "<td>{{item." + field + "}}</td>";
+      }).join('\n                ');
+      return _.each(candidate.destFiles, function(destFile) {
+        return _.each(replaceMap, function(withText, replaceText) {
+          return grunt.file.write(destFile, myUtils.replaceAll(grunt.file.read(destFile), replaceText, withText));
+        });
+      });
     };
   };
 
