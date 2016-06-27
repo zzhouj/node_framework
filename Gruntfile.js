@@ -11,7 +11,7 @@
   myUtils = require('./utils/myUtils');
 
   module.exports = function(grunt) {
-    var addTask;
+    var addTask, tplTask;
     grunt.initConfig({
       pkg: grunt.file.readJSON('package.json'),
       init: {
@@ -98,6 +98,13 @@
           src: ['**.js', '!baseModel.js'],
           dest: 'sql/'
         }
+      },
+      tpl: {
+        models: {
+          cwd: 'models/',
+          src: ['**.js', '!baseModel.js'],
+          dest: 'public/app/'
+        }
       }
     });
     grunt.registerMultiTask('init', function() {
@@ -130,9 +137,7 @@
           content = grunt.file.read(file);
           if (content) {
             _.each(answers, function(val, key) {
-              var replacePattern;
-              replacePattern = myUtils.RegExpEscape("{{" + key + "}}");
-              return content = content.replace(new RegExp(replacePattern, 'g'), val);
+              return content = myUtils.replaceAll(content, "{{" + key + "}}", val);
             });
             return grunt.file.write(file, content);
           }
@@ -170,21 +175,18 @@
     });
     addTask = function(name, label, done) {
       var replaceText;
-      grunt.log.writeln(JSON.stringify(this));
       replaceText = this.data.replaceText;
       if (replaceText) {
         _.each(this.files, function(file) {
-          var destContent, replaceContent;
-          replaceContent = '';
+          var withText;
+          withText = '';
           _.each(file.src, function(srcFile) {
-            return replaceContent += grunt.file.read(path.join(file.cwd, srcFile));
+            return withText += grunt.file.read(path.join(file.cwd, srcFile));
           });
-          replaceContent = replaceContent.replace(new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name);
-          replaceContent = replaceContent.replace(new RegExp(myUtils.RegExpEscape("{{label}}"), 'g'), label);
-          replaceContent += "\n" + replaceText;
-          destContent = grunt.file.read(file.dest);
-          destContent = destContent.replace(new RegExp(myUtils.RegExpEscape(replaceText), 'g'), replaceContent);
-          return grunt.file.write(file.dest, destContent);
+          withText = myUtils.replaceAll(withText, "{{name}}", name);
+          withText = myUtils.replaceAll(withText, "{{label}}", label);
+          withText += "\n            " + replaceText;
+          return grunt.file.write(file.dest, myUtils.replaceAll(grunt.file.read(file.dest), replaceText, withText));
         });
       } else {
         _.each(this.files, function(file) {
@@ -195,8 +197,8 @@
             srcFile = path.join(file.cwd, srcFile);
             return grunt.file.copy(srcFile, destFile, {
               process: function(content) {
-                content = content.replace(new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name);
-                return content = content.replace(new RegExp(myUtils.RegExpEscape("{{label}}"), 'g'), label);
+                content = myUtils.replaceAll(content, "{{name}}", name);
+                return content = myUtils.replaceAll(content, "{{label}}", label);
               }
             });
           });
@@ -210,7 +212,7 @@
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'compress:dist']);
-    return grunt.registerMultiTask('sql', function() {
+    grunt.registerMultiTask('sql', function() {
       return _.each(this.files, function(file) {
         return _.each(file.src, function(srcFile) {
           var destFile, e, model, sql;
@@ -229,6 +231,51 @@
         });
       });
     });
+    grunt.registerMultiTask('tpl', function() {
+      var done;
+      done = this.async();
+      return _.each(this.files, function(file) {
+        var candidates, hint;
+        candidates = _.map(file.src, function(srcFile) {
+          return {
+            srcFile: path.join(file.cwd, srcFile),
+            model: srcFile.match(/(.+)\.js/)[1]
+          };
+        });
+        hint = _.map(candidates, function(candidate, i) {
+          return "" + i + ": " + candidate.model;
+        }).join('\n');
+        return prompt({
+          'candidateIndex': ["candidate index\n" + hint + "\n", 'no default']
+        }, function(err, answers) {
+          var candidate;
+          if (err) {
+            grunt.log.error(err);
+          }
+          if (err) {
+            return done(false);
+          }
+          candidate = candidates[answers.candidateIndex];
+          if (!candidate) {
+            grunt.log.error('invalid candidate index');
+          }
+          if (!candidate) {
+            return done(false);
+          }
+          candidate.destFiles = [path.join(file.dest, candidate.model, 'tpl/edit.tpl.html'), path.join(file.dest, candidate.model, 'tpl/list.tpl.html')];
+          tplTask(candidate);
+          return done();
+        });
+      });
+    });
+    return tplTask = function(candidate) {
+      var e, model;
+      try {
+        return model = require("./" + srcFile);
+      } catch (_error) {
+        e = _error;
+      }
+    };
   };
 
 }).call(this);

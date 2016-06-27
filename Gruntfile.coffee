@@ -84,6 +84,11 @@ module.exports = (grunt) ->
         cwd: 'models/'
         src: ['**.js', '!baseModel.js']
         dest: 'sql/'
+    tpl:
+      models:
+        cwd: 'models/'
+        src: ['**.js', '!baseModel.js']
+        dest: 'public/app/'
 
   grunt.registerMultiTask 'init', ->
     done = @async()
@@ -109,8 +114,7 @@ module.exports = (grunt) ->
         content = grunt.file.read file
         if content
           _.each answers, (val, key) ->
-            replacePattern = myUtils.RegExpEscape "{{#{key}}}"
-            content = content.replace new RegExp(replacePattern, 'g'), val
+            content = myUtils.replaceAll content, "{{#{key}}}", val
           grunt.file.write file, content
       done()
 
@@ -134,19 +138,16 @@ module.exports = (grunt) ->
         addTask.call @, name, label, done
 
   addTask = (name, label, done) ->
-    grunt.log.writeln JSON.stringify @
     {replaceText} = @data
     if replaceText
       _.each @files, (file) ->
-        replaceContent = ''
+        withText = ''
         _.each file.src, (srcFile) ->
-          replaceContent += grunt.file.read path.join file.cwd, srcFile
-        replaceContent = replaceContent.replace new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name
-        replaceContent = replaceContent.replace new RegExp(myUtils.RegExpEscape("{{label}}"), 'g'), label
-        replaceContent += "\n" + replaceText
-        destContent = grunt.file.read file.dest
-        destContent = destContent.replace new RegExp(myUtils.RegExpEscape(replaceText), 'g'), replaceContent
-        grunt.file.write file.dest, destContent
+          withText += grunt.file.read path.join file.cwd, srcFile
+        withText = myUtils.replaceAll withText, "{{name}}", name
+        withText = myUtils.replaceAll withText, "{{label}}", label
+        withText += "\n            " + replaceText
+        grunt.file.write file.dest, myUtils.replaceAll grunt.file.read(file.dest), replaceText, withText
     else
       _.each @files, (file) ->
         _.each file.src, (srcFile) ->
@@ -155,8 +156,8 @@ module.exports = (grunt) ->
           srcFile = path.join file.cwd, srcFile
           grunt.file.copy srcFile, destFile,
             process: (content) ->
-              content = content.replace new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name
-              content = content.replace new RegExp(myUtils.RegExpEscape("{{label}}"), 'g'), label
+              content = myUtils.replaceAll content, "{{name}}", name
+              content = myUtils.replaceAll content, "{{label}}", label
     done?()
 
   grunt.loadNpmTasks 'grunt-contrib-clean'
@@ -186,3 +187,32 @@ module.exports = (grunt) ->
         if sql
           grunt.log.writeln "writing >> #{destFile}"
           grunt.file.write destFile, sql
+
+  grunt.registerMultiTask 'tpl', ->
+    done = @async()
+    _.each @files, (file) ->
+      candidates = _.map file.src, (srcFile) ->
+        srcFile: path.join file.cwd, srcFile
+        model: srcFile.match(/(.+)\.js/)[1]
+      hint = _.map(candidates, (candidate, i) ->
+        "#{i}: #{candidate.model}"
+      ).join '\n'
+      prompt
+        'candidateIndex': ["candidate index\n#{hint}\n", 'no default']
+      , (err, answers) ->
+        grunt.log.error err if err
+        return done false if err
+        candidate = candidates[answers.candidateIndex]
+        grunt.log.error 'invalid candidate index' unless candidate
+        return done false unless candidate
+        candidate.destFiles = [
+          path.join file.dest, candidate.model, 'tpl/edit.tpl.html'
+          path.join file.dest, candidate.model, 'tpl/list.tpl.html'
+        ]
+        tplTask candidate
+        done()
+
+  tplTask = (candidate) ->
+    try
+      model = require "./#{srcFile}"
+    catch e
