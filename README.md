@@ -1,5 +1,5 @@
 # node_framework
-web admin framework using node.js v0.10.x, angular.js v1.3.9 and bootstrap v3.3.5
+web app (admin) framework using node.js v0.10.x, angular.js v1.3.9, bootstrap v3.3.5, mysql and redis
 
 Usage
 =====
@@ -23,10 +23,19 @@ Usage
 4. add all app component
 
 		> grunt add:controllers add:models add:permissions add:restful add:app add:nav
-	is equal to:
+
+	is equal to
 
 		> grunt add
 
 5. export
 
 		> grunt dist
+
+6. generate mysql table create sql (in sql/)
+
+		> grunt sql
+
+7. update angular.js template html files by model definition
+
+		> grunt tpl
