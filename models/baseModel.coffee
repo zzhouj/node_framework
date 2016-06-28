@@ -3,9 +3,13 @@ dateformat = require 'dateformat'
 _ = require 'underscore'
 mysqlPool = require '../utils/mysqlPool'
 config = require '../config'
+assert = require 'assert'
 
 class BaseModel
   constructor: (@table) ->
+    if @table.labels
+      _.each @table.labels, (label, field) =>
+        assert @table.schema[field], "'#{field}' missing schema" unless field == '$model'
 
   query: (options, cb) ->
     {page} = options
