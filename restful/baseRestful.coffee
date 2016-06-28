@@ -16,7 +16,7 @@ module.exports = (Model) ->
       res.send row
     , _.extend(req.query, {$user: req.session.user})
 
-  router.put '/:id', (req, res) ->
+  router.post '/:id', (req, res) ->
     id = req.param 'id'
     item = req.body
     Model.update id, item, (err, result) ->

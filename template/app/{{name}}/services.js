@@ -6,11 +6,7 @@
 
   services.factory('Model', [
     '$resource', function($resource) {
-      return $resource('/rest/{{name}}/:id', null, {
-        update: {
-          method: 'PUT'
-        }
-      });
+      return $resource('/rest/{{name}}/:id');
     }
   ]);
 

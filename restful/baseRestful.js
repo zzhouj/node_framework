@@ -31,7 +31,7 @@
         $user: req.session.user
       }));
     });
-    router.put('/:id', function(req, res) {
+    router.post('/:id', function(req, res) {
       var id, item;
       id = req.param('id');
       item = req.body;

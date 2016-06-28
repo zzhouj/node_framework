@@ -83,20 +83,18 @@
         id: $scope.item.id || '$defaults'
       });
       $scope.save = function() {
-        var action, _base;
-        action = $scope.isNew ? '$save' : '$update';
         if (!$scope.item.createTime) {
           $scope.item.createTime = new Date();
         }
         $scope.item.updateTime = new Date();
-        return typeof (_base = $scope.item)[action] === "function" ? _base[action]({
+        return $scope.item.$save({
           id: $scope.item.id
         }, function() {
           alert('保存成功');
           return $modalInstance.close('ok');
         }, function(res) {
           return $scope.err = "Error " + res.status + ": " + (JSON.stringify(res.data));
-        }) : void 0;
+        });
       };
       return $scope.cancel = function() {
         return $modalInstance.dismiss('cancel');
