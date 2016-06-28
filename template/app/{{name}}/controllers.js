@@ -10,10 +10,14 @@
       $scope.criteria = {
         page: 0
       };
-      $scope.query = query = function() {
+      query = function() {
         return $scope.collection = Model.query($scope.criteria);
       };
       query();
+      $scope.query = function() {
+        $scope.criteria.page = 0;
+        return query();
+      };
       $scope.prevPage = function() {
         if ($scope.criteria.page > 0) {
           $scope.criteria.page -= 1;

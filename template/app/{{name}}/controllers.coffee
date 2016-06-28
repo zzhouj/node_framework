@@ -4,9 +4,13 @@ controllers.controller 'ListController', ['$scope', '$rootScope', '$modal', 'Mod
   ($scope, $rootScope, $modal, Model) ->
     $scope.criteria = {page: 0}
 
-    $scope.query = query = ->
+    query = ->
       $scope.collection = Model.query $scope.criteria
     query()
+
+    $scope.query = ->
+      $scope.criteria.page = 0
+      query()
 
     $scope.prevPage = ->
       if $scope.criteria.page > 0
