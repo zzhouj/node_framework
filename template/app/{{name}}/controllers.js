@@ -78,15 +78,18 @@
   ]);
 
   controllers.controller('EditController', [
-    '$scope', '$modalInstance', 'Model', function($scope, $modalInstance, Model) {
+    '$scope', '$modalInstance', 'Model', 'transform', function($scope, $modalInstance, Model, transform) {
       $scope.item = Model.get({
         id: $scope.item.id || '$defaults'
+      }, function() {
+        return transform != null ? typeof transform.onLoad === "function" ? transform.onLoad($scope.item) : void 0 : void 0;
       });
       $scope.save = function() {
-        if (!$scope.item.createTime) {
-          $scope.item.createTime = new Date();
+        if (transform != null) {
+          if (typeof transform.onSave === "function") {
+            transform.onSave($scope.item);
+          }
         }
-        $scope.item.updateTime = new Date();
         return $scope.item.$save({
           id: $scope.item.id
         }, function() {
@@ -101,5 +104,17 @@
       };
     }
   ]);
+
+  controllers.factory('transform', function() {
+    return {
+      onLoad: function(item) {},
+      onSave: function(item) {
+        if (!item.createTime) {
+          item.createTime = new Date();
+        }
+        return item.updateTime = new Date();
+      }
+    };
+  });
 
 }).call(this);

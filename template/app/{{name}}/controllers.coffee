@@ -49,17 +49,25 @@ controllers.controller 'ListController', ['$scope', '$rootScope', '$modal', 'Mod
             alert "Error #{res.status}: #{JSON.stringify res.data}"
 ]
 
-controllers.controller 'EditController', ['$scope', '$modalInstance', 'Model', ($scope, $modalInstance, Model) ->
-  $scope.item = Model.get {id: $scope.item.id || '$defaults'}
-  $scope.save = ->
-    $scope.item.createTime = new Date() unless $scope.item.createTime
-    $scope.item.updateTime = new Date()
-    $scope.item.$save {id: $scope.item.id}, ->
-      alert '保存成功'
-      $modalInstance.close('ok')
-    , (res)->
-      $scope.err = "Error #{res.status}: #{JSON.stringify res.data}"
+controllers.controller 'EditController', ['$scope', '$modalInstance', 'Model', 'transform',
+  ($scope, $modalInstance, Model, transform) ->
+    $scope.item = Model.get {id: $scope.item.id || '$defaults'}, ->
+      transform?.onLoad? $scope.item
+    $scope.save = ->
+      transform?.onSave? $scope.item
+      $scope.item.$save {id: $scope.item.id}, ->
+        alert '保存成功'
+        $modalInstance.close('ok')
+      , (res)->
+        $scope.err = "Error #{res.status}: #{JSON.stringify res.data}"
 
-  $scope.cancel = ->
-    $modalInstance.dismiss('cancel')
+    $scope.cancel = ->
+      $modalInstance.dismiss('cancel')
 ]
+
+controllers.factory 'transform', ->
+  onLoad: (item) ->
+
+  onSave: (item) ->
+    item.createTime = new Date() unless item.createTime
+    item.updateTime = new Date()
