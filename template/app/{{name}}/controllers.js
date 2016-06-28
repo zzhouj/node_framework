@@ -79,13 +79,9 @@
 
   controllers.controller('EditController', [
     '$scope', '$modalInstance', 'Model', function($scope, $modalInstance, Model) {
-      var id;
-      id = $scope.item.id;
-      if (id) {
-        $scope.item = Model.get({
-          id: id
-        });
-      }
+      $scope.item = Model.get({
+        id: $scope.item.id || '$defaults'
+      });
       $scope.save = function() {
         var action, _base;
         action = $scope.isNew ? '$save' : '$update';
@@ -94,7 +90,7 @@
         }
         $scope.item.updateTime = new Date();
         return typeof (_base = $scope.item)[action] === "function" ? _base[action]({
-          id: id
+          id: $scope.item.id
         }, function() {
           alert('保存成功');
           return $modalInstance.close('ok');

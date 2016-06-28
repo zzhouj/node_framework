@@ -50,13 +50,12 @@ controllers.controller 'ListController', ['$scope', '$rootScope', '$modal', 'Mod
 ]
 
 controllers.controller 'EditController', ['$scope', '$modalInstance', 'Model', ($scope, $modalInstance, Model) ->
-  {id} = $scope.item
-  $scope.item = Model.get {id} if id
+  $scope.item = Model.get {id: $scope.item.id || '$defaults'}
   $scope.save = ->
     action = if $scope.isNew then '$save' else '$update'
     $scope.item.createTime = new Date() unless $scope.item.createTime
     $scope.item.updateTime = new Date()
-    $scope.item[action]? {id}, ->
+    $scope.item[action]? {id: $scope.item.id}, ->
       alert '保存成功'
       $modalInstance.close('ok')
     , (res)->

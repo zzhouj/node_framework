@@ -20,10 +20,17 @@
       this.table = table;
       if (this.table.labels) {
         _.each(this.table.labels, (function(_this) {
-          return function(label, field) {
-            if (field !== '$model') {
-              return assert(_this.table.schema[field], "'" + field + "' missing schema");
+          return function(val, key) {
+            if (key !== '$model') {
+              return assert(_this.table.schema[key], "'" + key + "' missing schema");
             }
+          };
+        })(this));
+      }
+      if (this.table.defaults) {
+        _.each(this.table.defaults, (function(_this) {
+          return function(val, key) {
+            return assert(_this.table.schema[key], "'" + key + "' missing schema");
           };
         })(this));
       }
@@ -58,6 +65,9 @@
 
     BaseModel.prototype.get = function(id, cb) {
       var sql;
+      if (id === '$defaults') {
+        return cb(null, this.getDefaults());
+      }
       sql = "SELECT\n*\nFROM " + (mysql.escapeId(this.table.name)) + "\nWHERE " + (mysql.escapeId(this.table.id)) + " = " + (mysql.escape(id));
       return mysqlPool.query(sql, function(err, rows) {
         if (err) {
@@ -178,6 +188,19 @@
       sql += "\t" + (mysql.escapeId(this.table.id)) + " BIGINT(20) NOT NULL AUTO_INCREMENT,\n";
       sql += "\tPRIMARY KEY (" + (mysql.escapeId(this.table.id)) + ")\n";
       return sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n";
+    };
+
+    BaseModel.prototype.getDefaults = function() {
+      if (!this.table.defaults) {
+        return {};
+      }
+      return _.mapObject(this.table.defaults, function(val, key) {
+        if ((typeof val) === 'function') {
+          return val();
+        } else {
+          return val;
+        }
+      });
     };
 
     return BaseModel;

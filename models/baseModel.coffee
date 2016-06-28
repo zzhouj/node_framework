@@ -8,8 +8,11 @@ assert = require 'assert'
 class BaseModel
   constructor: (@table) ->
     if @table.labels
-      _.each @table.labels, (label, field) =>
-        assert @table.schema[field], "'#{field}' missing schema" unless field == '$model'
+      _.each @table.labels, (val, key) =>
+        assert @table.schema[key], "'#{key}' missing schema" unless key == '$model'
+    if @table.defaults
+      _.each @table.defaults, (val, key) =>
+        assert @table.schema[key], "'#{key}' missing schema"
 
   query: (options, cb) ->
     {page} = options
@@ -33,6 +36,7 @@ class BaseModel
       cb err, rows
 
   get: (id, cb) ->
+    return cb null, @getDefaults() if id == '$defaults'
     sql = """
           SELECT
           *
@@ -107,5 +111,13 @@ class BaseModel
     sql += "\t#{mysql.escapeId @table.id} BIGINT(20) NOT NULL AUTO_INCREMENT,\n"
     sql += "\tPRIMARY KEY (#{mysql.escapeId @table.id})\n"
     sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"
+
+  getDefaults: ->
+    return {} unless @table.defaults
+    _.mapObject @table.defaults, (val, key) ->
+      if (typeof val) == 'function'
+        val()
+      else
+        val
 
 module.exports = BaseModel
