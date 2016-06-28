@@ -2,11 +2,20 @@ controllers = angular.module 'controllers', ['services', 'ui.bootstrap']
 
 controllers.controller 'ListController', ['$scope', '$rootScope', '$modal', 'Model',
   ($scope, $rootScope, $modal, Model) ->
-    $scope.criteria = {}
+    $scope.criteria = {page: 0}
 
     $scope.query = query = ->
       $scope.collection = Model.query $scope.criteria
     query()
+
+    $scope.prevPage = ->
+      if $scope.criteria.page > 0
+        $scope.criteria.page -= 1
+        query()
+
+    $scope.nextPage = ->
+      $scope.criteria.page += 1
+      query()
 
     $scope.new = ->
       modalInstance = $modal.open

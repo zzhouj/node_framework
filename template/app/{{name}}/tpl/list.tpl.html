@@ -10,25 +10,32 @@
             <a class="btn btn-primary" href="" role="button" ng-click="query()">查询</a>
         </form>
     </div>
-    <div class="panel-body">
-        <table class="table table-bordered table-hover table-striped">
-            <thead>
-            <tr>
-                <td>ID ↓</td>
-                <td>{{field.label}}</td>
-                <td>操作</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="item in collection">
-                <td>{{item.id}}</td>
-                <td>{{field.value}}</td>
-                <td>
-                    <button class="btn btn-success btn-sm" ng-click="edit(item)">编辑</button>
-                    <button class="btn btn-danger btn-sm" ng-click="delete(item)">删除</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+    <table class="table table-bordered table-hover table-striped table-condensed">
+        <thead>
+        <tr>
+            <td>ID ↓</td>
+            <td>{{field.label}}</td>
+            <td>操作</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="item in collection">
+            <td>{{item.id}}</td>
+            <td>{{field.value}}</td>
+            <td>
+                <button class="btn btn-success btn-sm" ng-click="edit(item)">编辑</button>
+                <button class="btn btn-danger btn-sm" ng-click="delete(item)">删除</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="panel-footer">
+        <nav>
+            <ul class="pager">
+                <li><a href="" ng-click="prevPage()">上一页</a></li>
+                <li><a href="">第 {{criteria.page + 1}} 页</a></li>
+                <li><a href="" ng-click="nextPage()">下一页</a></li>
+            </ul>
+        </nav>
     </div>
 </div>

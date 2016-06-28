@@ -7,11 +7,23 @@
   controllers.controller('ListController', [
     '$scope', '$rootScope', '$modal', 'Model', function($scope, $rootScope, $modal, Model) {
       var query;
-      $scope.criteria = {};
+      $scope.criteria = {
+        page: 0
+      };
       $scope.query = query = function() {
         return $scope.collection = Model.query($scope.criteria);
       };
       query();
+      $scope.prevPage = function() {
+        if ($scope.criteria.page > 0) {
+          $scope.criteria.page -= 1;
+          return query();
+        }
+      };
+      $scope.nextPage = function() {
+        $scope.criteria.page += 1;
+        return query();
+      };
       $scope["new"] = function() {
         var modalInstance;
         modalInstance = $modal.open({
