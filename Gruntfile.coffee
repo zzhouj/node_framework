@@ -258,7 +258,11 @@ module.exports = (grunt) ->
     labels = _.omit labels, 'createTime', 'updateTime'
     indent = '        '
     replaceMap["#{indent}<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, (label, field) ->
-      typeAttr = if options[field]?.type == Number then ' type="number"' else ''
+      typeAttr = ''
+      if options[field]?.type == Number
+        typeAttr = ' type="number"'
+      else if options[field]?.type == Date
+        typeAttr = ' type="datetime-local"'
       requireAttr = if options[field]?.isNotNull then ' required' else ''
       """
       #{indent}<div class="form-group">

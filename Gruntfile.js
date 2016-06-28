@@ -342,9 +342,14 @@
       labels = _.omit(labels, 'createTime', 'updateTime');
       indent = '        ';
       replaceMap["" + indent + "<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, function(label, field) {
-        var requireAttr, typeAttr, _ref1, _ref2;
-        typeAttr = ((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number ? ' type="number"' : '';
-        requireAttr = ((_ref2 = options[field]) != null ? _ref2.isNotNull : void 0) ? ' required' : '';
+        var requireAttr, typeAttr, _ref1, _ref2, _ref3;
+        typeAttr = '';
+        if (((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number) {
+          typeAttr = ' type="number"';
+        } else if (((_ref2 = options[field]) != null ? _ref2.type : void 0) === Date) {
+          typeAttr = ' type="datetime-local"';
+        }
+        requireAttr = ((_ref3 = options[field]) != null ? _ref3.isNotNull : void 0) ? ' required' : '';
         return "" + indent + "<div class=\"form-group\">\n" + indent + "    <label for=\"" + field + "\">" + label + "：</label>\n" + indent + "    <input class=\"form-control\" id=\"" + field + "\" ng-model=\"item." + field + "\"" + typeAttr + requireAttr + ">\n" + indent + "</div>";
       }).join('\n');
       return _.each(candidate.destFiles, function(destFile) {
