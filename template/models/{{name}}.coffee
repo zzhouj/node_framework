@@ -1,6 +1,14 @@
 BaseModel = require './baseModel'
+mysql = require 'mysql'
 
-module.exports = new BaseModel
+class Model extends BaseModel
+  getWhereSql: (options) ->
+    {name} = options
+    whereSql = " 1=1 "
+    whereSql += " AND name LIKE #{mysql.escape "%#{name}%"} " if name
+    whereSql
+
+module.exports = new Model
   name: '{{name}}'
   id: 'id'
 #  orderBy: 'name'

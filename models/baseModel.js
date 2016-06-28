@@ -19,7 +19,7 @@
     }
 
     BaseModel.prototype.query = function(options, cb) {
-      var page, sql;
+      var page, sql, whereSql;
       page = options.page;
       if (page) {
         page = parseInt(page) || 0;
@@ -27,6 +27,10 @@
       sql = typeof this.getQuerySql === "function" ? this.getQuerySql(options) : void 0;
       if (!sql) {
         sql = "SELECT\n*\nFROM " + (mysql.escapeId(this.table.name)) + "\n";
+      }
+      whereSql = typeof this.getWhereSql === "function" ? this.getWhereSql(options) : void 0;
+      if (whereSql) {
+        sql += " WHERE " + whereSql + " ";
       }
       if (this.table.orderBy) {
         sql += " ORDER BY " + this.table.orderBy + " ";

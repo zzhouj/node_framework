@@ -18,6 +18,8 @@ class BaseModel
             FROM #{mysql.escapeId @table.name}
 
             """
+    whereSql = @getWhereSql?(options)
+    sql += " WHERE #{whereSql} " if whereSql
     if @table.orderBy
       sql += " ORDER BY #{@table.orderBy} "
     else
