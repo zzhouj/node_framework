@@ -144,23 +144,23 @@
       _.each(this.table.schema, (function(_this) {
         return function(option, field) {
           var mysqlType;
-          option = (option != null ? option.type : void 0) != null ? option : {
+          option = (option != null ? option.type : void 0) != null ? _.extend(option) : {
             type: option
           };
           if (option.isNotNull == null) {
             option.isNotNull = true;
           }
           if (option.type === String) {
-            mysqlType = "varchar(" + (option.size || 45) + ")";
-          } else if (option.type = Number) {
-            mysqlType = "bigint(" + (option.size || 20) + ")";
+            mysqlType = "VARCHAR(" + (option.size || 45) + ")";
+          } else if (option.type === Number) {
+            mysqlType = "BIGINT(" + (option.size || 20) + ")";
           } else if (option.type === Date) {
-            mysqlType = "datetime";
+            mysqlType = "DATETIME";
           }
           return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNotNull ? 'NOT NULL' : '') + ",\n";
         };
       })(this));
-      sql += "\t" + (mysql.escapeId(this.table.id)) + " bigint(20) NOT NULL AUTO_INCREMENT,\n";
+      sql += "\t" + (mysql.escapeId(this.table.id)) + " BIGINT(20) NOT NULL AUTO_INCREMENT,\n";
       sql += "\tPRIMARY KEY (" + (mysql.escapeId(this.table.id)) + ")\n";
       return sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n";
     };
