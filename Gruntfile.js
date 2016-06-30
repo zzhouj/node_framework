@@ -325,7 +325,7 @@
         replaceMap['{{model.label}}'] = labels.$model;
       }
       labels = _.omit(labels, '$model');
-      indent = '                ';
+      indent = '            ';
       replaceMap['<td>{{field.label}}</td>'] = _.map(_.values(labels), function(label) {
         return "<td>" + label + "</td>";
       }).join("\n" + indent);
