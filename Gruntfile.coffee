@@ -184,13 +184,12 @@ module.exports = (grunt) ->
 
   grunt.registerMultiTask 'fix', ->
     return grunt.log.error 'no options' unless @data.options
-    {mysqlHost, redisHost} = @data.options
-    return grunt.log.error 'invalid options' unless mysqlHost and redisHost
+    {mysqlHost, redisHost, cdnUrl} = @data.options
     for src in @filesSrc
       config = grunt.file.readJSON src
       if config
-        config.mysql.host = mysqlHost
-        config.redis.host = redisHost
+        config.mysql.host = mysqlHost if mysqlHost
+        config.redis.host = redisHost if redisHost
         grunt.file.write src, JSON.stringify config, null, 4
 
   grunt.registerMultiTask 'sql', ->

@@ -222,22 +222,23 @@
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'fix:config', 'compress:dist']);
     grunt.registerMultiTask('fix', function() {
-      var config, mysqlHost, redisHost, src, _i, _len, _ref, _ref1, _results;
+      var cdnUrl, config, mysqlHost, redisHost, src, _i, _len, _ref, _ref1, _results;
       if (!this.data.options) {
         return grunt.log.error('no options');
       }
-      _ref = this.data.options, mysqlHost = _ref.mysqlHost, redisHost = _ref.redisHost;
-      if (!(mysqlHost && redisHost)) {
-        return grunt.log.error('invalid options');
-      }
+      _ref = this.data.options, mysqlHost = _ref.mysqlHost, redisHost = _ref.redisHost, cdnUrl = _ref.cdnUrl;
       _ref1 = this.filesSrc;
       _results = [];
       for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
         src = _ref1[_i];
         config = grunt.file.readJSON(src);
         if (config) {
-          config.mysql.host = mysqlHost;
-          config.redis.host = redisHost;
+          if (mysqlHost) {
+            config.mysql.host = mysqlHost;
+          }
+          if (redisHost) {
+            config.redis.host = redisHost;
+          }
           _results.push(grunt.file.write(src, JSON.stringify(config, null, 4)));
         } else {
           _results.push(void 0);
