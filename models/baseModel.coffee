@@ -107,7 +107,7 @@ class BaseModel
         mysqlType = "BIGINT(#{option.size || 20})"
       else if option.type == Date
         mysqlType = "DATETIME"
-      sql += "\t#{mysql.escapeId field} #{mysqlType} #{if option.isNotNull then 'NOT NULL' else ''},\n"
+      sql += "\t#{mysql.escapeId field} #{mysqlType} #{if option.isNotNull then 'NOT NULL' else 'NULL'},\n"
     sql += "\t#{mysql.escapeId @table.id} BIGINT(20) NOT NULL AUTO_INCREMENT,\n"
     sql += "\tPRIMARY KEY (#{mysql.escapeId @table.id})\n"
     sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"

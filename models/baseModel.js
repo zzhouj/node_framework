@@ -182,7 +182,7 @@
           } else if (option.type === Date) {
             mysqlType = "DATETIME";
           }
-          return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNotNull ? 'NOT NULL' : '') + ",\n";
+          return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNotNull ? 'NOT NULL' : 'NULL') + ",\n";
         };
       })(this));
       sql += "\t" + (mysql.escapeId(this.table.id)) + " BIGINT(20) NOT NULL AUTO_INCREMENT,\n";
