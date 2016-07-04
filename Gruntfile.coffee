@@ -60,6 +60,7 @@ module.exports = (grunt) ->
         src: [
           '{bin,config,views,public}/**'
           '!**/*.{coffee,js}'
+          '!public/download/**'
           'public/javascripts/vendor/**/*.js'
           'app.js'
           'package.json'
@@ -184,7 +185,7 @@ module.exports = (grunt) ->
 
   grunt.registerMultiTask 'fix', ->
     return grunt.log.error 'no options' unless @data.options
-    {mysqlHost, redisHost, cdnUrl} = @data.options
+    {mysqlHost, redisHost} = @data.options
     for src in @filesSrc
       config = grunt.file.readJSON src
       if config

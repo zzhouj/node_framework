@@ -70,7 +70,7 @@
       copy: {
         dist: {
           expand: true,
-          src: ['{bin,config,views,public}/**', '!**/*.{coffee,js}', 'public/javascripts/vendor/**/*.js', 'app.js', 'package.json', 'restart.sh'],
+          src: ['{bin,config,views,public}/**', '!**/*.{coffee,js}', '!public/download/**', 'public/javascripts/vendor/**/*.js', 'app.js', 'package.json', 'restart.sh'],
           dest: 'dist/<%= pkg.name %>/'
         }
       },
@@ -222,11 +222,11 @@
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'fix:config', 'compress:dist']);
     grunt.registerMultiTask('fix', function() {
-      var cdnUrl, config, mysqlHost, redisHost, src, _i, _len, _ref, _ref1, _results;
+      var config, mysqlHost, redisHost, src, _i, _len, _ref, _ref1, _results;
       if (!this.data.options) {
         return grunt.log.error('no options');
       }
-      _ref = this.data.options, mysqlHost = _ref.mysqlHost, redisHost = _ref.redisHost, cdnUrl = _ref.cdnUrl;
+      _ref = this.data.options, mysqlHost = _ref.mysqlHost, redisHost = _ref.redisHost;
       _ref1 = this.filesSrc;
       _results = [];
       for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
