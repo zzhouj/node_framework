@@ -11,7 +11,7 @@
   myUtils = require('./utils/myUtils');
 
   module.exports = function(grunt) {
-    var addTask, tplTask;
+    var addTask, removeTask, tplTask;
     grunt.initConfig({
       pkg: grunt.file.readJSON('package.json'),
       init: {
@@ -55,6 +55,26 @@
           replaceText: '<!--{{nav}}-->'
         }
       },
+      remove: {
+        controllers: {
+          src: ['controllers/{{name}}Controller.coffee', 'controllers/{{name}}Controller.js']
+        },
+        models: {
+          src: ['models/{{name}}.coffee', 'models/{{name}}.js']
+        },
+        permissions: {
+          src: ['permissions/{{name}}Permission.coffee', 'permissions/{{name}}Permission.js']
+        },
+        restful: {
+          src: ['restful/{{name}}Restful.coffee', 'restful/{{name}}Restful.js']
+        },
+        app: {
+          src: ['public/app/{{name}}/']
+        },
+        sql: {
+          src: ['sql/{{name}}.sql']
+        }
+      },
       clean: {
         dist: ['dist/'],
         coffee_js: ['dist/**/*.coffee.js']
@@ -70,7 +90,7 @@
       copy: {
         dist: {
           expand: true,
-          src: ['{bin,config,views,public}/**', '!**/*.{coffee,js}', '!public/download/**', 'public/javascripts/vendor/**/*.js', 'app.js', 'package.json', 'restart.sh'],
+          src: ['{bin,config,views,public}/**', '!**/*.{coffee,js}', '!public/download/**', 'public/javascripts/vendor/**/*.js', 'app.js', 'Gruntfile.js', 'package.json', 'restart.sh'],
           dest: 'dist/<%= pkg.name %>/'
         }
       },
@@ -182,6 +202,34 @@
         })(this));
       }
     });
+    grunt.registerMultiTask('remove', function() {
+      var done, label, name;
+      name = grunt.config('remove.name');
+      label = grunt.config('remove.label');
+      if (name && label) {
+        return removeTask.call(this, name, label);
+      } else {
+        done = this.async();
+        return prompt({
+          'name': ['web app name', 'user'],
+          'label': ['web app label', '用户管理']
+        }, (function(_this) {
+          return function(err, answers) {
+            if (err) {
+              grunt.log.error(err);
+            }
+            if (err) {
+              return done(false);
+            }
+            grunt.log.writeln(JSON.stringify(answers, null, 4));
+            name = answers.name, label = answers.label;
+            grunt.config('remove.name', name);
+            grunt.config('remove.label', label);
+            return removeTask.call(_this, name, label, done);
+          };
+        })(this));
+      }
+    });
     addTask = function(name, label, done) {
       var replaceText;
       replaceText = this.data.replaceText;
@@ -212,6 +260,15 @@
             });
           });
         });
+      }
+      return typeof done === "function" ? done() : void 0;
+    };
+    removeTask = function(name, label, done) {
+      var src, _i, _len, _ref;
+      _ref = this.data.src;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        src = _ref[_i];
+        grunt.file["delete"](src.replace(new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name));
       }
       return typeof done === "function" ? done() : void 0;
     };

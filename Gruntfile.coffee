@@ -45,6 +45,35 @@ module.exports = (grunt) ->
         src: 'nav.html'
         dest: 'views/baseApp.ejs'
         replaceText: '<!--{{nav}}-->'
+    remove:
+      controllers:
+        src: [
+          'controllers/{{name}}Controller.coffee'
+          'controllers/{{name}}Controller.js'
+        ]
+      models:
+        src: [
+          'models/{{name}}.coffee'
+          'models/{{name}}.js'
+        ]
+      permissions:
+        src: [
+          'permissions/{{name}}Permission.coffee'
+          'permissions/{{name}}Permission.js'
+        ]
+      restful:
+        src: [
+          'restful/{{name}}Restful.coffee'
+          'restful/{{name}}Restful.js'
+        ]
+      app:
+        src: [
+          'public/app/{{name}}/'
+        ]
+      sql:
+        src: [
+          'sql/{{name}}.sql'
+        ]
     clean:
       dist: ['dist/']
       coffee_js: ['dist/**/*.coffee.js']
@@ -63,6 +92,7 @@ module.exports = (grunt) ->
           '!public/download/**'
           'public/javascripts/vendor/**/*.js'
           'app.js'
+          'Gruntfile.js'
           'package.json'
           'restart.sh'
         ]
@@ -144,6 +174,24 @@ module.exports = (grunt) ->
         grunt.config 'add.label', label
         addTask.call @, name, label, done
 
+  grunt.registerMultiTask 'remove', ->
+    name = grunt.config 'remove.name'
+    label = grunt.config 'remove.label'
+    if name and label
+      removeTask.call @, name, label
+    else
+      done = @async()
+      prompt
+        'name': ['web app name', 'user']
+        'label': ['web app label', '用户管理']
+      , (err, answers) =>
+        grunt.log.error err if err
+        return done false if err
+        grunt.log.writeln JSON.stringify answers, null, 4
+        {name, label} = answers
+        grunt.config 'remove.name', name
+        grunt.config 'remove.label', label
+        removeTask.call @, name, label, done
   addTask = (name, label, done) ->
     {replaceText} = @data
     if replaceText
@@ -167,6 +215,10 @@ module.exports = (grunt) ->
               content = myUtils.replaceAll content, "{{label}}", label
     done?()
 
+  removeTask = (name, label, done) ->
+    for src in @data.src
+      grunt.file.delete src.replace new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name
+    done?()
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-copy'
