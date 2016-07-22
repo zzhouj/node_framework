@@ -18,11 +18,16 @@ class BaseModel
     {page} = options
     page = parseInt(page) or 0 if page
     sql = @getQuerySql?(options)
+    leftJoin = @getLeftJoin?(options)
+    leftJoinFields = @getLeftJoinFields?(options)
+    leftJoinFields = ",#{leftJoinFields}" if leftJoinFields
     unless sql
       sql = """
             SELECT
-            *
-            FROM #{mysql.escapeId @table.name}
+            t1.*
+            #{leftJoinFields || ''}
+            FROM #{mysql.escapeId @table.name} t1
+            #{leftJoin || ''}
 
             """
     whereSql = @getWhereSql?(options)
@@ -30,7 +35,7 @@ class BaseModel
     if @table.orderBy
       sql += " ORDER BY #{@table.orderBy} "
     else
-      sql += " ORDER BY #{mysql.escapeId @table.id} DESC "
+      sql += " ORDER BY t1.#{mysql.escapeId @table.id} DESC "
     sql += " LIMIT #{page * config.pageSize}, #{config.pageSize} " if page?
     mysqlPool.query sql, (err, rows) ->
       cb err, rows

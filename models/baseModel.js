@@ -37,14 +37,19 @@
     }
 
     BaseModel.prototype.query = function(options, cb) {
-      var page, sql, whereSql;
+      var leftJoin, leftJoinFields, page, sql, whereSql;
       page = options.page;
       if (page) {
         page = parseInt(page) || 0;
       }
       sql = typeof this.getQuerySql === "function" ? this.getQuerySql(options) : void 0;
+      leftJoin = typeof this.getLeftJoin === "function" ? this.getLeftJoin(options) : void 0;
+      leftJoinFields = typeof this.getLeftJoinFields === "function" ? this.getLeftJoinFields(options) : void 0;
+      if (leftJoinFields) {
+        leftJoinFields = "," + leftJoinFields;
+      }
       if (!sql) {
-        sql = "SELECT\n*\nFROM " + (mysql.escapeId(this.table.name)) + "\n";
+        sql = "SELECT\nt1.*\n" + (leftJoinFields || '') + "\nFROM " + (mysql.escapeId(this.table.name)) + " t1\n" + (leftJoin || '') + "\n";
       }
       whereSql = typeof this.getWhereSql === "function" ? this.getWhereSql(options) : void 0;
       if (whereSql) {
@@ -53,7 +58,7 @@
       if (this.table.orderBy) {
         sql += " ORDER BY " + this.table.orderBy + " ";
       } else {
-        sql += " ORDER BY " + (mysql.escapeId(this.table.id)) + " DESC ";
+        sql += " ORDER BY t1." + (mysql.escapeId(this.table.id)) + " DESC ";
       }
       if (page != null) {
         sql += " LIMIT " + (page * config.pageSize) + ", " + config.pageSize + " ";
