@@ -22,6 +22,7 @@
       name = m[1];
       if (name !== 'default') {
         router.all("/" + name, require("../permissions/" + name + "Permission"));
+        router.all("/rest/" + name, require("../permissions/" + name + "Permission"));
       }
     }
   }
