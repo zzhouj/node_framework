@@ -169,8 +169,10 @@
     };
 
     BaseModel.prototype.createTableSql = function() {
-      var sql;
+      var index, indexKeys, key, keys, keywords, name, sql, statement, uniqueKeys, _i, _j, _k, _len, _len1, _len2, _ref;
       sql = "CREATE TABLE " + (mysql.escapeId(this.table.name)) + " (\n";
+      indexKeys = [];
+      uniqueKeys = [];
       _.each(this.table.schema, (function(_this) {
         return function(option, field) {
           var mysqlType;
@@ -179,6 +181,18 @@
           };
           if (option.isNotNull == null) {
             option.isNotNull = true;
+          }
+          if (option.index) {
+            indexKeys.push({
+              field: field,
+              desc: option.index < 0
+            });
+          }
+          if (option.unique) {
+            uniqueKeys.push({
+              field: field,
+              desc: option.unique < 0
+            });
           }
           if (option.type === String) {
             mysqlType = "VARCHAR(" + (option.size || 45) + ")";
@@ -192,6 +206,33 @@
       })(this));
       sql += "\t" + (mysql.escapeId(this.table.id)) + " BIGINT(20) NOT NULL AUTO_INCREMENT,\n";
       sql += "\tPRIMARY KEY (" + (mysql.escapeId(this.table.id)) + ")\n";
+      for (_i = 0, _len = indexKeys.length; _i < _len; _i++) {
+        key = indexKeys[_i];
+        sql += "\t, KEY " + (mysql.escapeId(key.field + '_index')) + " (" + (mysql.escapeId(key.field)) + (key.desc ? ' DESC' : '') + ")\n";
+      }
+      for (_j = 0, _len1 = uniqueKeys.length; _j < _len1; _j++) {
+        key = uniqueKeys[_j];
+        sql += "\t, UNIQUE KEY " + (mysql.escapeId(key.field + '_unique')) + " (" + (mysql.escapeId(key.field)) + (key.desc ? ' DESC' : '') + ")\n";
+      }
+      if (this.table.indexes) {
+        _ref = this.table.indexes;
+        for (_k = 0, _len2 = _ref.length; _k < _len2; _k++) {
+          index = _ref[_k];
+          keys = _.keys(index.keys);
+          keywords = (index.unique ? 'UNIQUE KEY' : 'KEY');
+          name = keys.join('_') + (index.unique ? '_unique' : '_index');
+          statement = ((function() {
+            var _l, _len3, _results;
+            _results = [];
+            for (_l = 0, _len3 = keys.length; _l < _len3; _l++) {
+              key = keys[_l];
+              _results.push("" + (mysql.escapeId(key)) + (index.keys[key] < 0 ? ' DESC' : ''));
+            }
+            return _results;
+          })()).join(',');
+          sql += "\t, " + keywords + " " + (mysql.escapeId(name)) + " (" + statement + ")\n";
+        }
+      }
       return sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n";
     };
 

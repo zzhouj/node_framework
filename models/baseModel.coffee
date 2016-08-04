@@ -103,9 +103,13 @@ class BaseModel
 
   createTableSql: ->
     sql = "CREATE TABLE #{mysql.escapeId @table.name} (\n"
+    indexKeys = []
+    uniqueKeys = []
     _.each @table.schema, (option, field) =>
       option = if option?.type? then _.extend(option) else {type: option}
       option.isNotNull = true unless option.isNotNull?
+      indexKeys.push {field, desc: option.index < 0} if option.index
+      uniqueKeys.push {field, desc: option.unique < 0} if option.unique
       if option.type == String
         mysqlType = "VARCHAR(#{option.size || 45})"
       else if option.type == Number
@@ -115,6 +119,17 @@ class BaseModel
       sql += "\t#{mysql.escapeId field} #{mysqlType} #{if option.isNotNull then 'NOT NULL' else 'NULL'},\n"
     sql += "\t#{mysql.escapeId @table.id} BIGINT(20) NOT NULL AUTO_INCREMENT,\n"
     sql += "\tPRIMARY KEY (#{mysql.escapeId @table.id})\n"
+    for key in indexKeys
+      sql += "\t, KEY #{mysql.escapeId key.field + '_index'} (#{mysql.escapeId key.field}#{if key.desc then ' DESC' else ''})\n"
+    for key in uniqueKeys
+      sql += "\t, UNIQUE KEY #{mysql.escapeId key.field + '_unique'} (#{mysql.escapeId key.field}#{if key.desc then ' DESC' else ''})\n"
+    if @table.indexes
+      for index in @table.indexes
+        keys = _.keys index.keys
+        keywords = (if index.unique then 'UNIQUE KEY' else 'KEY')
+        name = keys.join('_') + (if index.unique then '_unique' else '_index')
+        statement = ("#{mysql.escapeId key}#{if index.keys[key] < 0 then ' DESC' else ''}" for key in keys).join ','
+        sql += "\t, #{keywords} #{mysql.escapeId name} (#{statement})\n"
     sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"
 
   getDefaults: ->
