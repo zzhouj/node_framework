@@ -129,8 +129,9 @@
     };
 
     BaseModel.prototype.create = function(item, cb) {
-      var field, fields, i, sql, type, value, _i, _len, _ref, _ref1;
-      sql = "INSERT\nINTO " + (mysql.escapeId(this.table.name)) + "\nSET";
+      var field, fieldList, fields, items, sql, type, valueList, _ref;
+      items = _.isArray(item) ? item : [item];
+      item = items[0];
       fields = [];
       if (item[this.table.id]) {
         fields.push({
@@ -152,24 +153,42 @@
           });
         }
       }
-      for (i = _i = 0, _len = fields.length; _i < _len; i = ++_i) {
-        _ref1 = fields[i], field = _ref1.field, type = _ref1.type;
-        value = item[field];
-        if (type === Date) {
-          value = dateformat(item[field], 'yyyy-mm-dd HH:MM:ss');
+      fieldList = ((function() {
+        var _i, _len, _ref1, _results;
+        _results = [];
+        for (_i = 0, _len = fields.length; _i < _len; _i++) {
+          _ref1 = fields[_i], field = _ref1.field, type = _ref1.type;
+          _results.push("" + (mysql.escapeId(field)));
         }
-        sql += " " + (mysql.escapeId(field)) + " = " + (mysql.escape(value)) + " ";
-        if (i < (fields.length - 1)) {
-          sql += " , ";
-        }
-      }
+        return _results;
+      })()).join(', ');
+      sql = "INSERT IGNORE\nINTO " + (mysql.escapeId(this.table.name)) + "\n(" + fieldList + ")";
+      valueList = _.map(items, function(item) {
+        var values;
+        values = _.map(fields, function(field) {
+          var date, _ref1;
+          _ref1 = field, field = _ref1.field, type = _ref1.type;
+          if (type === Date) {
+            date = item[field];
+            if (typeof date === 'string' && date.indexOf('T') < 0) {
+              return "DATE(" + (mysql.escape(date)) + ")";
+            } else {
+              return mysql.escape(dateformat(date, 'yyyy-mm-dd HH:MM:ss'));
+            }
+          } else {
+            return mysql.escape(item[field]);
+          }
+        });
+        return "(" + (values.join(', ')) + ")";
+      });
+      sql += " VALUES " + (valueList.join(', ')) + " ";
       return mysqlPool.query(sql, function(err, result) {
         return cb(err, result);
       });
     };
 
     BaseModel.prototype.createTableSql = function() {
-      var index, indexKeys, key, keys, keywords, name, sql, statement, uniqueKeys, _i, _j, _k, _len, _len1, _len2, _ref;
+      var KEYWORDS, index, indexKeys, key, keys, name, sql, statement, uniqueKeys, _i, _j, _k, _len, _len1, _len2, _ref;
       sql = "CREATE TABLE " + (mysql.escapeId(this.table.name)) + " (\n";
       indexKeys = [];
       uniqueKeys = [];
@@ -219,7 +238,7 @@
         for (_k = 0, _len2 = _ref.length; _k < _len2; _k++) {
           index = _ref[_k];
           keys = _.keys(index.keys);
-          keywords = (index.unique ? 'UNIQUE KEY' : 'KEY');
+          KEYWORDS = (index.unique ? 'UNIQUE KEY' : 'KEY');
           name = keys.join('_') + (index.unique ? '_unique' : '_index');
           statement = ((function() {
             var _l, _len3, _results;
@@ -229,8 +248,8 @@
               _results.push("" + (mysql.escapeId(key)) + (index.keys[key] < 0 ? ' DESC' : ''));
             }
             return _results;
-          })()).join(',');
-          sql += "\t, " + keywords + " " + (mysql.escapeId(name)) + " (" + statement + ")\n";
+          })()).join(', ');
+          sql += "\t, " + KEYWORDS + " " + (mysql.escapeId(name)) + " (" + statement + ")\n";
         }
       }
       return sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n";

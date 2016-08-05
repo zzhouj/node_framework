@@ -82,22 +82,32 @@ class BaseModel
       cb err, result
 
   create: (item, cb) ->
-    sql = """
-          INSERT
-          INTO #{mysql.escapeId @table.name}
-          SET
-          """
+    items = if _.isArray item then item else [item]
+    item = items[0]
     fields = []
     fields.push {field: @table.id, type: String} if item[@table.id]
     for own field, type of @table.schema
       type = type.type if type?.type?
       fields.push {field, type} if item[field]?
-    for {field, type}, i in fields
-      value = item[field]
-      if type == Date
-        value = dateformat item[field], 'yyyy-mm-dd HH:MM:ss'
-      sql += " #{mysql.escapeId field} = #{mysql.escape value} "
-      sql += " , " if i < (fields.length - 1)
+    fieldList = ("#{mysql.escapeId field}" for {field, type} in fields).join ', '
+    sql = """
+          INSERT IGNORE
+          INTO #{mysql.escapeId @table.name}
+          (#{fieldList})
+          """
+    valueList = _.map items, (item) ->
+      values = _.map fields, (field) ->
+        {field, type} = field
+        if type == Date
+          date = item[field]
+          if typeof date == 'string' and date.indexOf('T') < 0
+            "DATE(#{mysql.escape date})"
+          else
+            mysql.escape dateformat date, 'yyyy-mm-dd HH:MM:ss'
+        else
+          mysql.escape item[field]
+      "(#{values.join ', '})"
+    sql += " VALUES #{valueList.join ', '} "
     mysqlPool.query sql, (err, result) ->
       cb err, result
 
@@ -126,10 +136,10 @@ class BaseModel
     if @table.indexes
       for index in @table.indexes
         keys = _.keys index.keys
-        keywords = (if index.unique then 'UNIQUE KEY' else 'KEY')
+        KEYWORDS = (if index.unique then 'UNIQUE KEY' else 'KEY')
         name = keys.join('_') + (if index.unique then '_unique' else '_index')
-        statement = ("#{mysql.escapeId key}#{if index.keys[key] < 0 then ' DESC' else ''}" for key in keys).join ','
-        sql += "\t, #{keywords} #{mysql.escapeId name} (#{statement})\n"
+        statement = ("#{mysql.escapeId key}#{if index.keys[key] < 0 then ' DESC' else ''}" for key in keys).join ', '
+        sql += "\t, #{KEYWORDS} #{mysql.escapeId name} (#{statement})\n"
     sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"
 
   getDefaults: ->

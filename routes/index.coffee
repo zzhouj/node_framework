@@ -31,4 +31,10 @@ for file in files
     if name != 'base'
       router.use "/rest/#{name}", require "../restful/#{name}Restful"
 
+cronsDir = path.join __dirname, '../crons'
+if fs.existsSync cronsDir
+  for f in fs.readdirSync cronsDir
+    if m = f.match /(\w+).js/
+      require "../crons/#{f}"
+
 module.exports = router
