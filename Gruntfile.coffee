@@ -192,6 +192,7 @@ module.exports = (grunt) ->
         grunt.config 'remove.name', name
         grunt.config 'remove.label', label
         removeTask.call @, name, label, done
+
   addTask = (name, label, done) ->
     {replaceText} = @data
     if replaceText
@@ -219,6 +220,7 @@ module.exports = (grunt) ->
     for src in @data.src
       grunt.file.delete src.replace new RegExp(myUtils.RegExpEscape("{{name}}"), 'g'), name
     done?()
+
   grunt.loadNpmTasks 'grunt-contrib-clean'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
   grunt.loadNpmTasks 'grunt-contrib-copy'
