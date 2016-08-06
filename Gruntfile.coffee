@@ -80,7 +80,7 @@ module.exports = (grunt) ->
     coffee:
       dist:
         expand: true
-        src: ['{controllers,models,permissions,public,restful,routes,utils}/**/*.coffee']
+        src: ['{controllers,crons,models,permissions,public,restful,routes,utils}/**/*.coffee']
         dest: 'dist/<%= pkg.name %>/'
         ext: '.coffee.js'
     copy:
