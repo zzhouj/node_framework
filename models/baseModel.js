@@ -37,19 +37,20 @@
     }
 
     BaseModel.prototype.query = function(options, cb) {
-      var leftJoin, leftJoinFields, page, sql, whereSql;
+      var fields, leftJoin, leftJoinFields, page, sql, whereSql;
       page = options.page;
       if (page) {
         page = parseInt(page) || 0;
       }
       sql = typeof this.getQuerySql === "function" ? this.getQuerySql(options) : void 0;
+      fields = typeof this.getFields === "function" ? this.getFields(options) : void 0;
       leftJoin = typeof this.getLeftJoin === "function" ? this.getLeftJoin(options) : void 0;
       leftJoinFields = typeof this.getLeftJoinFields === "function" ? this.getLeftJoinFields(options) : void 0;
       if (leftJoinFields) {
-        leftJoinFields = "," + leftJoinFields;
+        leftJoinFields = " ," + leftJoinFields + " ";
       }
       if (!sql) {
-        sql = "SELECT\nt1.*\n" + (leftJoinFields || '') + "\nFROM " + (mysql.escapeId(this.table.name)) + " t1\n" + (leftJoin || '') + "\n";
+        sql = "SELECT\n" + (fields || 't1.*') + "\n" + (leftJoinFields || '') + "\nFROM " + (mysql.escapeId(this.table.name)) + " t1\n" + (leftJoin || '') + "\n";
       }
       whereSql = typeof this.getWhereSql === "function" ? this.getWhereSql(options) : void 0;
       if (whereSql) {

@@ -18,13 +18,14 @@ class BaseModel
     {page} = options
     page = parseInt(page) or 0 if page
     sql = @getQuerySql?(options)
+    fields = @getFields?(options)
     leftJoin = @getLeftJoin?(options)
     leftJoinFields = @getLeftJoinFields?(options)
-    leftJoinFields = ",#{leftJoinFields}" if leftJoinFields
+    leftJoinFields = " ,#{leftJoinFields} " if leftJoinFields
     unless sql
       sql = """
             SELECT
-            t1.*
+            #{fields || 't1.*'}
             #{leftJoinFields || ''}
             FROM #{mysql.escapeId @table.name} t1
             #{leftJoin || ''}
