@@ -305,7 +305,7 @@ module.exports = (grunt) ->
       if options[field]?.type == Number
         "<td>{{item.#{field} | number}}</td>"
       else if options[field]?.type == Date
-        "<td>{{item.#{field} | date:'yyyy-MM-dd HH:mm:ss'}}</td>"
+        "<td>{{item.#{field} | date:'MM-dd HH:mm'}}</td>"
       else
         "<td>{{item.#{field}}}</td>"
     ).join("\n#{indent}")

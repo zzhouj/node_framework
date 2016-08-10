@@ -392,7 +392,7 @@
         if (((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number) {
           return "<td>{{item." + field + " | number}}</td>";
         } else if (((_ref2 = options[field]) != null ? _ref2.type : void 0) === Date) {
-          return "<td>{{item." + field + " | date:'yyyy-MM-dd HH:mm:ss'}}</td>";
+          return "<td>{{item." + field + " | date:'MM-dd HH:mm'}}</td>";
         } else {
           return "<td>{{item." + field + "}}</td>";
         }
