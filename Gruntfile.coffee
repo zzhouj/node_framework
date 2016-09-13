@@ -102,8 +102,8 @@ module.exports = (grunt) ->
         expand: true
         src: ['dist/<%= pkg.name %>/**/*.coffee.js']
         ext: '.js'
-    fix:
-      config:
+    fixconfig:
+      dist:
         options:
           mysqlHost: '10.6.22.97'
           redisHost: '10.6.25.201'
@@ -226,6 +226,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-copy'
   grunt.loadNpmTasks 'grunt-contrib-uglify'
   grunt.loadNpmTasks 'grunt-contrib-compress'
+  grunt.loadNpmTasks 'grunt-text-replace'
 
   grunt.registerTask 'dist', [
     'clean:dist'
@@ -233,11 +234,11 @@ module.exports = (grunt) ->
     'coffee:dist'
     'uglify:dist'
     'clean:coffee_js'
-    'fix:config'
+    'fixconfig:dist'
     'compress:dist'
   ]
 
-  grunt.registerMultiTask 'fix', ->
+  grunt.registerMultiTask 'fixconfig', ->
     return grunt.log.error 'no options' unless @data.options
     {mysqlHost, redisHost} = @data.options
     for src in @filesSrc

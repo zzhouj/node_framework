@@ -101,8 +101,8 @@
           ext: '.js'
         }
       },
-      fix: {
-        config: {
+      fixconfig: {
+        dist: {
           options: {
             mysqlHost: '10.6.22.97',
             redisHost: '10.6.25.201'
@@ -277,8 +277,9 @@
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-compress');
-    grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'fix:config', 'compress:dist']);
-    grunt.registerMultiTask('fix', function() {
+    grunt.loadNpmTasks('grunt-text-replace');
+    grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'fixconfig:dist', 'compress:dist']);
+    grunt.registerMultiTask('fixconfig', function() {
       var config, mysqlHost, redisHost, src, _i, _len, _ref, _ref1, _results;
       if (!this.data.options) {
         return grunt.log.error('no options');
