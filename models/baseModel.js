@@ -220,6 +220,8 @@
             mysqlType = "BIGINT(" + (option.size || 20) + ")";
           } else if (option.type === Date) {
             mysqlType = "DATETIME";
+          } else if ((typeof option.type) === "string") {
+            mysqlType = option.type;
           }
           return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNotNull ? 'NOT NULL' : 'NULL') + ",\n";
         };
