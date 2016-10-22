@@ -240,12 +240,17 @@ module.exports = (grunt) ->
 
   grunt.registerMultiTask 'fixconfig', ->
     return grunt.log.error 'no options' unless @data.options
-    {mysqlHost, redisHost} = @data.options
+    {port, mysqlHost, mysqlPort, mysqlUser, mysqlPassword, redisHost, rootSecret} = @data.options
     for src in @filesSrc
       config = grunt.file.readJSON src
       if config
+        config.port = port if port
         config.mysql.host = mysqlHost if mysqlHost
+        config.mysql.port = mysqlPort if mysqlPort
+        config.mysql.user = mysqlUser if mysqlUser
+        config.mysql.password = mysqlPassword if mysqlPassword
         config.redis.host = redisHost if redisHost
+        config.rootSecret = rootSecret if rootSecret
         grunt.file.write src, JSON.stringify config, null, 4
 
   grunt.registerMultiTask 'sql', ->
@@ -256,6 +261,7 @@ module.exports = (grunt) ->
         try
           model = require "./#{srcFile}"
         catch e
+          console.log e
         sql = model?.createTableSql?()
         if sql
           grunt.log.writeln "writing >> #{destFile}"

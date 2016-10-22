@@ -280,22 +280,37 @@
     grunt.loadNpmTasks('grunt-text-replace');
     grunt.registerTask('dist', ['clean:dist', 'copy:dist', 'coffee:dist', 'uglify:dist', 'clean:coffee_js', 'fixconfig:dist', 'compress:dist']);
     grunt.registerMultiTask('fixconfig', function() {
-      var config, mysqlHost, redisHost, src, _i, _len, _ref, _ref1, _results;
+      var config, mysqlHost, mysqlPassword, mysqlPort, mysqlUser, port, redisHost, rootSecret, src, _i, _len, _ref, _ref1, _results;
       if (!this.data.options) {
         return grunt.log.error('no options');
       }
-      _ref = this.data.options, mysqlHost = _ref.mysqlHost, redisHost = _ref.redisHost;
+      _ref = this.data.options, port = _ref.port, mysqlHost = _ref.mysqlHost, mysqlPort = _ref.mysqlPort, mysqlUser = _ref.mysqlUser, mysqlPassword = _ref.mysqlPassword, redisHost = _ref.redisHost, rootSecret = _ref.rootSecret;
       _ref1 = this.filesSrc;
       _results = [];
       for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
         src = _ref1[_i];
         config = grunt.file.readJSON(src);
         if (config) {
+          if (port) {
+            config.port = port;
+          }
           if (mysqlHost) {
             config.mysql.host = mysqlHost;
           }
+          if (mysqlPort) {
+            config.mysql.port = mysqlPort;
+          }
+          if (mysqlUser) {
+            config.mysql.user = mysqlUser;
+          }
+          if (mysqlPassword) {
+            config.mysql.password = mysqlPassword;
+          }
           if (redisHost) {
             config.redis.host = redisHost;
+          }
+          if (rootSecret) {
+            config.rootSecret = rootSecret;
           }
           _results.push(grunt.file.write(src, JSON.stringify(config, null, 4)));
         } else {
@@ -314,6 +329,7 @@
             model = require("./" + srcFile);
           } catch (_error) {
             e = _error;
+            console.log(e);
           }
           sql = model != null ? typeof model.createTableSql === "function" ? model.createTableSql() : void 0 : void 0;
           if (sql) {
