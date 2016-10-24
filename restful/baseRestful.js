@@ -26,6 +26,9 @@
         if (err) {
           return res.status(500).send(err);
         }
+        if (typeof row === 'string') {
+          res.set('Content-Type', 'text/plain');
+        }
         return res.send(row);
       }, _.extend(req.query, {
         $user: req.session.user

@@ -13,6 +13,8 @@ module.exports = (Model) ->
     id = req.param 'id'
     Model.get id, (err, row) ->
       return res.status(500).send err if err
+      if typeof row == 'string'
+        res.set 'Content-Type', 'text/plain'
       res.send row
     , _.extend(req.query, {$user: req.session.user})
 
