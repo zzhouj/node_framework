@@ -132,6 +132,9 @@
     BaseModel.prototype.create = function(item, cb) {
       var field, fieldList, fields, items, sql, type, valueList, _ref;
       items = _.isArray(item) ? item : [item];
+      if (!(item && items && items.length > 0)) {
+        return cb('no rows to insert');
+      }
       item = items[0];
       fields = [];
       if (item[this.table.id]) {

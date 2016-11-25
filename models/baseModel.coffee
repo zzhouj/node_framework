@@ -84,6 +84,7 @@ class BaseModel
 
   create: (item, cb) ->
     items = if _.isArray item then item else [item]
+    return cb 'no rows to insert' unless item and items and items.length > 0
     item = items[0]
     fields = []
     fields.push {field: @table.id, type: String} if item[@table.id]
