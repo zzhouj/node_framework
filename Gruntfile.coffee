@@ -240,7 +240,7 @@ module.exports = (grunt) ->
 
   grunt.registerMultiTask 'fixconfig', ->
     return grunt.log.error 'no options' unless @data.options
-    {port, mysqlHost, mysqlPort, mysqlUser, mysqlPassword, redisHost, rootSecret} = @data.options
+    {port, mysqlHost, mysqlPort, mysqlUser, mysqlPassword, redisHost, rootSecret, cdnUrl} = @data.options
     for src in @filesSrc
       config = grunt.file.readJSON src
       if config
@@ -251,6 +251,7 @@ module.exports = (grunt) ->
         config.mysql.password = mysqlPassword if mysqlPassword
         config.redis.host = redisHost if redisHost
         config.rootSecret = rootSecret if rootSecret
+        config.cdnUrl = cdnUrl if cdnUrl
         grunt.file.write src, JSON.stringify config, null, 4
 
   grunt.registerMultiTask 'sql', ->
