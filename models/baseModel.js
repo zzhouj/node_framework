@@ -192,7 +192,7 @@
     };
 
     BaseModel.prototype.createTableSql = function() {
-      var KEYWORDS, index, indexKeys, key, keys, name, sql, statement, uniqueKeys, _i, _j, _k, _len, _len1, _len2, _ref;
+      var KEYWORDS, autoIncrement, index, indexKeys, key, keys, name, sql, statement, uniqueKeys, _i, _j, _k, _len, _len1, _len2, _ref;
       sql = "CREATE TABLE " + (mysql.escapeId(this.table.name)) + " (\n";
       indexKeys = [];
       uniqueKeys = [];
@@ -258,7 +258,8 @@
           sql += "\t, " + KEYWORDS + " " + (mysql.escapeId(name)) + " (" + statement + ")\n";
         }
       }
-      return sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n";
+      autoIncrement = this.table.autoIncrement ? "AUTO_INCREMENT=" + this.table.autoIncrement + " " : '';
+      return sql += ") ENGINE=InnoDB " + autoIncrement + "DEFAULT CHARSET=utf8;\n";
     };
 
     BaseModel.prototype.getDefaults = function() {

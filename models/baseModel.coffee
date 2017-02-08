@@ -144,7 +144,8 @@ class BaseModel
         name = keys.join('_') + (if index.unique then '_unique' else '_index')
         statement = ("#{mysql.escapeId key}#{if index.keys[key] < 0 then ' DESC' else ''}" for key in keys).join ', '
         sql += "\t, #{KEYWORDS} #{mysql.escapeId name} (#{statement})\n"
-    sql += ") ENGINE=InnoDB DEFAULT CHARSET=utf8;\n"
+    autoIncrement = if @table.autoIncrement then "AUTO_INCREMENT=#{@table.autoIncrement} " else ''
+    sql += ") ENGINE=InnoDB #{autoIncrement}DEFAULT CHARSET=utf8;\n"
 
   getDefaults: ->
     return {} unless @table.defaults
