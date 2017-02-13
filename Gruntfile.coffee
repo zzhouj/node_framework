@@ -305,7 +305,7 @@ module.exports = (grunt) ->
     replaceMap['{{name.label}}'] = labels.name if labels.name
     replaceMap['{{model.label}}'] = labels.$model if labels.$model
     labels = _.omit labels, '$model'
-    indent = '            '
+    indent = '                '
     replaceMap['<td>{{field.label}}</td>'] = _.map(_.values(labels), (label) ->
       "<td>#{label}</td>"
     ).join("\n#{indent}")

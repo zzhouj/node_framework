@@ -10,25 +10,27 @@
             <a class="btn btn-primary" href="" role="button" ng-click="query()">查询</a>
         </form>
     </div>
-    <table class="table table-bordered table-hover table-striped table-condensed">
-        <thead>
-        <tr>
-            <td>ID ↓</td>
-            <td>{{field.label}}</td>
-            <td>操作</td>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="item in collection">
-            <td>{{item.id}}</td>
-            <td>{{field.value}}</td>
-            <td>
-                <button class="btn btn-success btn-sm" ng-click="edit(item)">编辑</button>
-                <button class="btn btn-danger btn-sm" ng-click="delete(item)">删除</button>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="panel-body" style="overflow-x: auto">
+        <table class="table table-bordered table-hover table-striped table-condensed">
+            <thead>
+            <tr>
+                <td>ID ↓</td>
+                <td>{{field.label}}</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="item in collection">
+                <td>{{item.id}}</td>
+                <td>{{field.value}}</td>
+                <td>
+                    <button class="btn btn-success btn-sm" ng-click="edit(item)">编辑</button>
+                    <button class="btn btn-danger btn-sm" ng-click="delete(item)">删除</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
     <div class="panel-footer">
         <nav>
             <ul class="pager">
