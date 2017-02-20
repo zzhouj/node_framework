@@ -304,35 +304,41 @@ module.exports = (grunt) ->
     replaceMap = {}
     replaceMap['{{name.label}}'] = labels.name if labels.name
     replaceMap['{{model.label}}'] = labels.$model if labels.$model
-    labels = _.omit labels, '$model'
+    destContents = _.map candidate.destFiles, (destFile) ->
+      grunt.file.read(destFile)
+    labels = _.omit labels, (label, field) ->
+      return true if field == '$model'
+      for destContent in destContents
+        return true if destContent?.match new RegExp "item\\.#{myUtils.RegExpEscape field}"
+      false
     indent = '                '
-    replaceMap['<td>{{field.label}}</td>'] = _.map(_.values(labels), (label) ->
-      "<td>#{label}</td>"
-    ).join("\n#{indent}")
-    replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), (field) ->
-      if options[field]?.type == Number
-        "<td>{{item.#{field} | number}}</td>"
-      else if options[field]?.type == Date
-        "<td>{{item.#{field} | date:'MM-dd HH:mm'}}</td>"
-      else
-        "<td>{{item.#{field}}}</td>"
-    ).join("\n#{indent}")
+    replaceMap["<!--{{field.label}}-->"] = _.map(_.values(labels), (label) ->
+        "<td>#{label}</td>"
+      ).join("\n#{indent}") + "\n#{indent}<!--{{field.label}}-->"
+    replaceMap["<!--{{field.value}}-->"] = _.map(_.keys(labels), (field) ->
+        if options[field]?.type == Number
+          "<td>{{item.#{field} | number}}</td>"
+        else if options[field]?.type == Date
+          "<td>{{item.#{field} | date:'MM-dd HH:mm'}}</td>"
+        else
+          "<td>{{item.#{field}}}</td>"
+      ).join("\n#{indent}") + "\n#{indent}<!--{{field.value}}-->"
     labels = _.omit labels, 'createTime', 'updateTime'
     indent = '        '
-    replaceMap["#{indent}<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, (label, field) ->
-      typeAttr = ''
-      if options[field]?.type == Number
-        typeAttr = ' type="number"'
-      else if options[field]?.type == Date
-        typeAttr = ' type="datetime-local"'
-      requireAttr = if options[field]?.isNotNull then ' required' else ''
-      """
+    replaceMap["#{indent}<!--{{field.input}}-->"] = _.map(labels, (label, field) ->
+        typeAttr = ''
+        if options[field]?.type == Number
+          typeAttr = ' type="number"'
+        else if options[field]?.type == Date
+          typeAttr = ' type="datetime-local"'
+        requireAttr = if options[field]?.isNotNull then ' required' else ''
+        """
       #{indent}<div class="form-group">
       #{indent}    <label for="#{field}">#{label}：</label>
       #{indent}    <input class="form-control" id="#{field}" ng-model="item.#{field}"#{typeAttr}#{requireAttr}>
       #{indent}</div>
       """
-    ).join('\n')
+      ).join('\n') + "\n#{indent}<!--{{field.input}}-->"
     _.each candidate.destFiles, (destFile) ->
       _.each replaceMap, (withText, replaceText) ->
         grunt.file.write destFile, myUtils.replaceAll grunt.file.read(destFile), replaceText, withText

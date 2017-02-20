@@ -15,14 +15,14 @@
             <thead>
             <tr>
                 <td>ID ↓</td>
-                <td>{{field.label}}</td>
+                <!--{{field.label}}-->
                 <td>操作</td>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="item in collection">
                 <td>{{item.id}}</td>
-                <td>{{field.value}}</td>
+                <!--{{field.value}}-->
                 <td>
                     <button class="btn btn-success btn-sm" ng-click="edit(item)">编辑</button>
                     <button class="btn btn-danger btn-sm" ng-click="delete(item)">删除</button>

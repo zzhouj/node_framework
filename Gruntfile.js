@@ -380,7 +380,7 @@
       });
     });
     return tplTask = function(candidate) {
-      var indent, labels, model, options, replaceMap, schema, _ref;
+      var destContents, indent, labels, model, options, replaceMap, schema, _ref;
       model = require("./" + candidate.srcFile);
       labels = ((_ref = model.table) != null ? _ref.labels : void 0) || {};
       schema = model.table.schema;
@@ -402,12 +402,27 @@
       if (labels.$model) {
         replaceMap['{{model.label}}'] = labels.$model;
       }
-      labels = _.omit(labels, '$model');
+      destContents = _.map(candidate.destFiles, function(destFile) {
+        return grunt.file.read(destFile);
+      });
+      labels = _.omit(labels, function(label, field) {
+        var destContent, _i, _len;
+        if (field === '$model') {
+          return true;
+        }
+        for (_i = 0, _len = destContents.length; _i < _len; _i++) {
+          destContent = destContents[_i];
+          if (destContent != null ? destContent.match(new RegExp("item\\." + (myUtils.RegExpEscape(field)))) : void 0) {
+            return true;
+          }
+        }
+        return false;
+      });
       indent = '                ';
-      replaceMap['<td>{{field.label}}</td>'] = _.map(_.values(labels), function(label) {
+      replaceMap["<!--{{field.label}}-->"] = _.map(_.values(labels), function(label) {
         return "<td>" + label + "</td>";
-      }).join("\n" + indent);
-      replaceMap['<td>{{field.value}}</td>'] = _.map(_.keys(labels), function(field) {
+      }).join("\n" + indent) + ("\n" + indent + "<!--{{field.label}}-->");
+      replaceMap["<!--{{field.value}}-->"] = _.map(_.keys(labels), function(field) {
         var _ref1, _ref2;
         if (((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number) {
           return "<td>{{item." + field + " | number}}</td>";
@@ -416,10 +431,10 @@
         } else {
           return "<td>{{item." + field + "}}</td>";
         }
-      }).join("\n" + indent);
+      }).join("\n" + indent) + ("\n" + indent + "<!--{{field.value}}-->");
       labels = _.omit(labels, 'createTime', 'updateTime');
       indent = '        ';
-      replaceMap["" + indent + "<div class=\"form-group\">{{field.input}}</div>"] = _.map(labels, function(label, field) {
+      replaceMap["" + indent + "<!--{{field.input}}-->"] = _.map(labels, function(label, field) {
         var requireAttr, typeAttr, _ref1, _ref2, _ref3;
         typeAttr = '';
         if (((_ref1 = options[field]) != null ? _ref1.type : void 0) === Number) {
@@ -429,7 +444,7 @@
         }
         requireAttr = ((_ref3 = options[field]) != null ? _ref3.isNotNull : void 0) ? ' required' : '';
         return "" + indent + "<div class=\"form-group\">\n" + indent + "    <label for=\"" + field + "\">" + label + "：</label>\n" + indent + "    <input class=\"form-control\" id=\"" + field + "\" ng-model=\"item." + field + "\"" + typeAttr + requireAttr + ">\n" + indent + "</div>";
-      }).join('\n');
+      }).join('\n') + ("\n" + indent + "<!--{{field.input}}-->");
       return _.each(candidate.destFiles, function(destFile) {
         return _.each(replaceMap, function(withText, replaceText) {
           return grunt.file.write(destFile, myUtils.replaceAll(grunt.file.read(destFile), replaceText, withText));
