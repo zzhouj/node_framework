@@ -14,6 +14,11 @@
         return $scope.collection = Model.query($scope.criteria);
       };
       query();
+      $scope.keypress = function($event) {
+        if ($event.keyCode === 13) {
+          return $scope.query();
+        }
+      };
       $scope.query = function() {
         $scope.criteria.page = 0;
         return query();

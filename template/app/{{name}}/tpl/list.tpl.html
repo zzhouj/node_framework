@@ -5,7 +5,7 @@
 
             <div class="form-group">
                 <label for="criteria">{{name.label}}：</label>
-                <input class="form-control" id="criteria" ng-model="criteria.name">
+                <input class="form-control" id="criteria" ng-model="criteria.name" ng-keypress="keypress($event)">
             </div>
             <a class="btn btn-primary" href="" role="button" ng-click="query()">查询</a>
         </form>

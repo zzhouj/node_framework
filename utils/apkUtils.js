@@ -41,8 +41,8 @@
       maxBuffer: 1024 * 1024
     }, function(err, result) {
       var applicationLabel, m, packageName, versionCode, versionName;
-      if (err || !result) {
-        return cb(err);
+      if (!result) {
+        return cb('aapt: no result');
       }
       if (m = result.match(/package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'/)) {
         packageName = m[1];

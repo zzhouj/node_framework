@@ -8,6 +8,10 @@ controllers.controller 'ListController', ['$scope', '$rootScope', '$modal', 'Mod
       $scope.collection = Model.query $scope.criteria
     query()
 
+    $scope.keypress = ($event) ->
+      if $event.keyCode == 13
+        $scope.query()
+
     $scope.query = ->
       $scope.criteria.page = 0
       query()

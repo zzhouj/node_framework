@@ -18,7 +18,7 @@ module.exports =
 
 parsePackageInfo = (filename, cb) ->
   execFile config.aapt, ['d', 'badging', filename], {maxBuffer: 1024 * 1024}, (err, result) ->
-    return cb err if err or not result
+    return cb 'aapt: no result' if not result
     if m = result.match /package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'/
       packageName = m[1]
       versionCode = m[2]
