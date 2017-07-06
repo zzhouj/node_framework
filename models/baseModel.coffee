@@ -131,7 +131,7 @@ class BaseModel
       else if (typeof option.type) == "string"
         mysqlType = option.type
       sql += "\t#{mysql.escapeId field} #{mysqlType} #{if option.isNotNull then 'NOT NULL' else 'NULL'},\n"
-    sql += "\t#{mysql.escapeId @table.id} BIGINT(20) NOT NULL AUTO_INCREMENT,\n"
+    sql += "\t#{mysql.escapeId @table.id} BIGINT(20) NOT NULL AUTO_INCREMENT,\n" unless @table.schema[@table.id]
     sql += "\tPRIMARY KEY (#{mysql.escapeId @table.id})\n"
     for key in indexKeys
       sql += "\t, KEY #{mysql.escapeId key.field + '_index'} (#{mysql.escapeId key.field}#{if key.desc then ' DESC' else ''})\n"

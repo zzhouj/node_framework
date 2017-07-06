@@ -229,7 +229,9 @@
           return sql += "\t" + (mysql.escapeId(field)) + " " + mysqlType + " " + (option.isNotNull ? 'NOT NULL' : 'NULL') + ",\n";
         };
       })(this));
-      sql += "\t" + (mysql.escapeId(this.table.id)) + " BIGINT(20) NOT NULL AUTO_INCREMENT,\n";
+      if (!this.table.schema[this.table.id]) {
+        sql += "\t" + (mysql.escapeId(this.table.id)) + " BIGINT(20) NOT NULL AUTO_INCREMENT,\n";
+      }
       sql += "\tPRIMARY KEY (" + (mysql.escapeId(this.table.id)) + ")\n";
       for (_i = 0, _len = indexKeys.length; _i < _len; _i++) {
         key = indexKeys[_i];
