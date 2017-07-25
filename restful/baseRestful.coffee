@@ -21,7 +21,7 @@ module.exports = (Model) ->
   router.post '/:id', (req, res) ->
     id = req.param 'id'
     item = req.body
-    Model.update id, item, (err, result) ->
+    Model.update id, _.extend(item, {$user: req.session.user}), (err, result) ->
       return res.status(500).send err if err
       res.send result
 

@@ -38,7 +38,9 @@
       var id, item;
       id = req.param('id');
       item = req.body;
-      return Model.update(id, item, function(err, result) {
+      return Model.update(id, _.extend(item, {
+        $user: req.session.user
+      }), function(err, result) {
         if (err) {
           return res.status(500).send(err);
         }
