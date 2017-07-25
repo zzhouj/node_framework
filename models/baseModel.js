@@ -37,10 +37,16 @@
     }
 
     BaseModel.prototype.query = function(options, cb) {
-      var fields, leftJoin, leftJoinFields, page, sql, whereSql;
-      page = options.page;
+      var fields, leftJoin, leftJoinFields, page, pageSize, sql, whereSql;
+      page = options.page, pageSize = options.pageSize;
       if (page) {
         page = parseInt(page) || 0;
+      }
+      if (pageSize) {
+        pageSize = parseInt(pageSize) || config.pageSize;
+      }
+      if (!(pageSize > 0)) {
+        pageSize = config.pageSize;
       }
       sql = typeof this.getQuerySql === "function" ? this.getQuerySql(options) : void 0;
       fields = typeof this.getFields === "function" ? this.getFields(options) : void 0;
@@ -62,7 +68,7 @@
         sql += " ORDER BY t1." + (mysql.escapeId(this.table.id)) + " DESC ";
       }
       if (page != null) {
-        sql += " LIMIT " + (page * config.pageSize) + ", " + config.pageSize + " ";
+        sql += " LIMIT " + (page * pageSize) + ", " + pageSize + " ";
       }
       return mysqlPool.query(sql, function(err, rows) {
         return cb(err, rows);
@@ -129,8 +135,12 @@
       });
     };
 
-    BaseModel.prototype.create = function(item, cb) {
+    BaseModel.prototype.create = function(item, ignoreDup, cb) {
       var field, fieldList, fields, items, sql, type, valueList, _ref;
+      if (cb == null) {
+        cb = ignoreDup;
+        ignoreDup = true;
+      }
       items = _.isArray(item) ? item : [item];
       if (!(item && items && items.length > 0)) {
         return cb('no rows to insert');
@@ -166,7 +176,7 @@
         }
         return _results;
       })()).join(', ');
-      sql = "INSERT IGNORE\nINTO " + (mysql.escapeId(this.table.name)) + "\n(" + fieldList + ")";
+      sql = "INSERT " + (ignoreDup ? 'IGNORE' : '') + "\nINTO " + (mysql.escapeId(this.table.name)) + "\n(" + fieldList + ")";
       valueList = _.map(items, function(item) {
         var values;
         values = _.map(fields, function(field) {

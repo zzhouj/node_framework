@@ -15,8 +15,10 @@ class BaseModel
         assert @table.schema[key], "'#{key}' missing schema"
 
   query: (options, cb) ->
-    {page} = options
+    {page, pageSize} = options
     page = parseInt(page) or 0 if page
+    pageSize = parseInt(pageSize) or config.pageSize if pageSize
+    pageSize = config.pageSize unless pageSize > 0
     sql = @getQuerySql?(options)
     fields = @getFields?(options)
     leftJoin = @getLeftJoin?(options)
@@ -37,7 +39,7 @@ class BaseModel
       sql += " ORDER BY #{@table.orderBy} "
     else
       sql += " ORDER BY t1.#{mysql.escapeId @table.id} DESC "
-    sql += " LIMIT #{page * config.pageSize}, #{config.pageSize} " if page?
+    sql += " LIMIT #{page * pageSize}, #{pageSize} " if page?
     mysqlPool.query sql, (err, rows) ->
       cb err, rows
 
@@ -82,7 +84,10 @@ class BaseModel
     mysqlPool.query sql, (err, result) ->
       cb err, result
 
-  create: (item, cb) ->
+  create: (item, ignoreDup, cb) ->
+    unless cb?
+      cb = ignoreDup
+      ignoreDup = true
     items = if _.isArray item then item else [item]
     return cb 'no rows to insert' unless item and items and items.length > 0
     item = items[0]
@@ -93,7 +98,7 @@ class BaseModel
       fields.push {field, type} if item[field]?
     fieldList = ("#{mysql.escapeId field}" for {field, type} in fields).join ', '
     sql = """
-          INSERT IGNORE
+          INSERT #{if ignoreDup then 'IGNORE' else ''}
           INTO #{mysql.escapeId @table.name}
           (#{fieldList})
           """
