@@ -6,4 +6,5 @@ module.exports = (req, res, next) ->
     res.locals.user = req.session.user
     next()
   else
-    res.redirect '/login'
+    state = encodeURIComponent req.url
+    res.redirect "/login?state=#{state}"

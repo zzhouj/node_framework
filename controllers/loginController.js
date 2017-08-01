@@ -15,13 +15,17 @@
   });
 
   router.post('/', function(req, res) {
-    var password, username, _ref;
+    var password, state, username, _ref;
+    state = req.query.state;
     _ref = req.body, username = _ref.username, password = _ref.password;
     if (username === 'root' && password === config.rootSecret) {
       req.session.user = {
         username: username,
         admin: true
       };
+      if (state) {
+        return res.redirect(state);
+      }
       return res.redirect('../');
     } else {
       return res.render('login', {
