@@ -285,10 +285,11 @@ module.exports = (grunt) ->
         candidate = candidates[answers.candidateIndex]
         grunt.log.error 'invalid candidate index' unless candidate
         return done false unless candidate
-        candidate.destFiles = [
+        candidate.destFiles = _.filter [
           path.join file.dest, candidate.model, 'tpl/edit.tpl.html'
           path.join file.dest, candidate.model, 'tpl/list.tpl.html'
-        ]
+        ], (destFile) ->
+          grunt.file.exists(destFile)
         tplTask candidate
         done()
 

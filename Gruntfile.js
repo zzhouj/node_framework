@@ -373,7 +373,9 @@
           if (!candidate) {
             return done(false);
           }
-          candidate.destFiles = [path.join(file.dest, candidate.model, 'tpl/edit.tpl.html'), path.join(file.dest, candidate.model, 'tpl/list.tpl.html')];
+          candidate.destFiles = _.filter([path.join(file.dest, candidate.model, 'tpl/edit.tpl.html'), path.join(file.dest, candidate.model, 'tpl/list.tpl.html')], function(destFile) {
+            return grunt.file.exists(destFile);
+          });
           tplTask(candidate);
           return done();
         });
